@@ -1,0 +1,21 @@
+to setup
+  clear-all
+  py:setup py:python
+  py:run "import autarki_agent as pyagent"
+  set-default-shape turtles "circle"
+
+  ;; create the agents and give them random strategies
+  ;; these are the only strategies these agents will ever have though they
+  ;; can change which of this "bag of strategies" they use every tick
+  create-turtles 10 [
+    set color white
+  ]
+  reset-ticks ;; start the clock
+end
+
+to go ; make sure everything is ready to go!
+  output-print (py:runresult "pyagent.test('Testing String')")
+  py:set "x" "Python Variable" ;; Set python's "x" to string
+  let temp (py:runresult "pyagent.test(x)")
+  output-print (temp)
+end
