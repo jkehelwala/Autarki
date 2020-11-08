@@ -1,0 +1,56 @@
+;; Actual Scheduling of Transaction Propogation
+
+to schedule_transaction_propogation
+  let cur_time ticks
+  time:schedule-repeating-event "observer" [ [] -> init_server_transaction ] cur_time new-transaction-generation-time ;; Initiate a new transaction every "new-transaction-generation-time" ticks 
+  ask peers [
+    time:schedule-repeating-event self [ [] -> push_peer_transaction ] cur_time (con-strength + peer-breathe-time) ;; Push transaction depending on your connection strength + known constant
+  ]
+end
+
+to init_server_transaction
+  let tmp_ticks ticks
+  py:set "transaction_id" tmp_ticks
+  py:run "new_transaction = pyagent.transaction(run_no, transaction_id)"
+  ask bserver [
+    ask n-of first-contact my-out-server-cons [
+      if [is-down] of other-end [ stop ]
+      time:schedule-event other-end ([ [] ->
+        py:set "p_id" [peer-id] of self
+        set transactions (py:runresult "pyagent.propagate_to_peer(run_no, p_id, new_transaction)")
+      ]) (tmp_ticks + [delay] of self)
+    ]
+  ]
+end
+
+to push_peer_transaction ;; turtle-method
+  if is-down [ stop ]
+  let tmp_ticks ticks
+  py:set "new_prop_tranasaction" transactions
+  ask my-out-peer-cons [
+      if [is-down] of other-end [ stop ]
+      time:schedule-event other-end ([ [] ->
+        py:set "p_id" [peer-id] of self
+        set transactions (py:runresult "pyagent.propagate_to_peer(run_no, p_id, new_prop_tranasaction)")
+      ]) (tmp_ticks + [delay] of self)
+  ]
+end
+
+;; Scheduling of Direct Transaction Propogation from Server
+
+to schedule_transaction_propogation_temp
+  time:schedule-repeating-event "observer" [ [] -> init_server_transaction_temp ] ticks new-transaction-generation-time
+end
+
+to init_server_transaction_temp ;; Temporary for speed
+  let tmp_ticks ticks
+  py:set "transaction_id" tmp_ticks
+  py:run "new_transaction = pyagent.transaction(run_no, transaction_id)"
+  ask bserver [
+    ask server-con-neighbors [
+      if is-down [ stop ]
+      py:set "p_id" peer-id
+      set transactions (py:runresult "pyagent.propagate_to_peer(run_no, p_id, new_transaction)")
+    ]
+  ]
+end

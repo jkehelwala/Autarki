@@ -1,2 +1,48 @@
-extensions [ py ]
-__includes [ "NetLogo/procs.nls" "NetLogo/utils.nls" ]
+extensions [ py time ]
+__includes [ "NetLogo/procs.nls" "NetLogo/procs_transactions.nls" ]
+
+;; define universal breeds
+breed [peers peer]
+;; breed [victims victim]
+breed [servers server]
+breed [attackers attacker]
+directed-link-breed [server-cons server-con]
+directed-link-breed [attacker-cons attacker-con]
+undirected-link-breed [peer-cons peer-con]
+links-own [delay]
+
+
+attackers-own[
+  blocks_to_attack
+]
+
+peers-own [
+  peer-id 
+  con-strength 
+  allowed-link-no 
+  is-down 
+  is-protected
+  transactions
+  history
+  ;; strategies      ;; TODO list of strategies (from elfarol)
+  ;; best-strategy   ;; TODO index of the current best strategy (from elfarol)
+  ;; prediction      ;; TODO current prediction of the bar attendance
+]
+
+
+globals [ 
+  bserver 
+  battacker 
+  first-contact
+  current_round
+  current_block
+  const-attack-probabilities
+  const-con-strength 
+  const-peers ;; (list min max)
+  ;; 
+  ;; Timing related
+  new-transaction-generation-time
+  peer-breathe-time
+  ;; Visualization Related
+  subdue-color ;;  To make non-neighbour links less visible
+]

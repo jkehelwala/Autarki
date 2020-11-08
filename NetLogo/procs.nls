@@ -1,21 +1,149 @@
+
 to setup
   clear-all
   py:setup py:python
   py:run "import autarki_agent as pyagent"
-  set-default-shape turtles "circle"
-
-  ;; create the agents and give them random strategies
-  ;; these are the only strategies these agents will ever have though they
-  ;; can change which of this "bag of strategies" they use every tick
-  create-turtles 10 [
-    set color white
-  ]
+  py:set "run_no" behaviorspace-run-number
+  py:run "pyagent.init_run(run_no)"
+  ;; ask patches [ set pcolor white ]
+  set_constants
+  setup_peers
   reset-ticks ;; start the clock
+  initiate_round
 end
 
 to go ; make sure everything is ready to go!
-  output-print (py:runresult "pyagent.test('Testing String')")
-  py:set "x" "Python Variable" ;; Set python's "x" to string
-  let temp (py:runresult "pyagent.test(x)")
-  output-print (temp)
+  time:go-until 200 ;; time:go
+  ask peers [
+    output-print(list who transactions) ;; TODO
+  ]
+  ;; output-print (py:runresult "pyagent.test('Testing String')")
+  ;; py:set "x" "Python Variable" ;; Set python's "x" to string
+  ;; let temp (py:runresult "pyagent.test(x)")
 end
+
+to set_constants
+  set-default-shape peers "a_peer"
+  ;; Constant setup
+  set subdue-color 4
+  set first-contact round (No_of_Peers / 10)
+  ;; Network setup
+  set current_round 0
+  set const-con-strength (list 1 10)
+  set const-peers (list 2 4) 
+  set const-attack-probabilities (list 0.01 1)
+  ;; Timing setup
+  set new-transaction-generation-time 30
+  set peer-breathe-time 2
+end
+
+to setup_hosts
+  ;; ask server 0  [ ... ]                  ;; tell the first one...
+  ;; if breed = wolves [ ... ]
+  ;; ask one-of wolves [ set breed sheep ]
+  ;; create the agents and give them random strategies
+  ;; these are the only strategies these agents will ever have though they
+  ;; can change which of this "bag of strategies" they use every tick
+end
+
+to setup_peers
+  ;; Creating Servers
+  create-servers 1 [
+    set color blue
+    set shape "a_server"
+    setxy -15 0
+  ]
+  create-attackers 1 [
+    set color orange
+    set shape "monster"
+    setxy 15 0
+  ]
+  set bserver one-of servers
+  set battacker one-of attackers
+  ;; Creating Peers
+  create-peers No_of_Peers [
+    ;; set color turquoise
+    setxy random-pxcor random-pycor
+    set transactions "{}"
+    set is-down False
+    set con-strength first const-con-strength +  random (last const-con-strength - first const-con-strength)
+    set allowed-link-no first const-peers + random (last const-peers - first const-peers) 
+    py:set "x" who ;; TONOTE: This is for record keeping/signature. Peers will not be addressed through this. 
+    set peer-id (py:runresult "pyagent.create_peer(run_no, x)")
+  ]
+  ask bserver [ 
+    create-server-cons-to other peers [ 
+      set color blue - subdue-color  
+      set delay [con-strength] of other-end 
+    ]
+    ;; ask my-out-server-cons []
+  ]
+  ask battacker [ 
+    create-attacker-cons-to other peers [ 
+      set delay [con-strength] of other-end
+      set color orange - subdue-color
+    ]
+  ]
+  ask peers [
+    let available-links [allowed-link-no] of self - (count my-peer-cons ) ;; leftover links than the default server/attacker connections
+    if available-links > 0 [ 
+      create-peer-cons-with n-of available-links other peers
+    ]
+    ask peer-cons [
+      set color turquoise
+      set delay min(list [con-strength] of end1 [con-strength] of end2)
+      ;; set thickness delay /(last const-con-strength * 10) ;; TODO: Uncomment for visual confirmation
+    ]   
+  ]
+  ;; ask one-of peers [ ... ] ;; TODO: This line is for simple testing
+  ;; ask n-of 2 peers [ ... ] ;; TODO: This line is for simple testing
+end
+
+to initiate_round
+  set current_round (current_round + 1)
+  py:set "current_round" current_round
+  set current_block 0
+  remove_attacker_influence
+  py:set "attack_probability_range" const-attack-probabilities
+  py:set "blocks_to_be_proposed" No_of_Peers
+  py:run "pyagent.start_round(run_no, current_round, blocks_to_be_proposed, attack_probability_range)"
+  ask battacker [ set blocks_to_attack (py:runresult "pyagent.get_blocks_to_attack(run_no, current_round)")  ]
+  schedule_transaction_propogation_temp ;; TODO change for realistic simulation
+  ;; TODO bring forward remaining transactions if any, reschedule everything as a fresh start.
+  ;; TODO Schedule Initiate Block (Check Readme)
+end
+
+to initiate_block
+  set current_block (current_block + 1)
+  if current_block > No_of_Peers [
+    initiate_round
+    stop
+  ]
+  remove_attacker_influence
+  if member? current_block [blocks_to_attack] of battacker [ 
+    ask battacker [
+      ask attacker-con-neighbors [ attack_agent ]
+    ]
+  ]
+end
+
+to remove_attacker_influence
+  ask peers [
+    if not is-down [ stop ] 
+    py:set "p_id" [peer-id] of self 
+    py:run "pyagent.remove_attacker_influence(run_no, p_id)"
+    set is-down False
+    set shape "a_peer"
+  ]
+end
+
+to attack_agent
+  py:set "p_id" [peer-id] of self 
+  set is-down (py:runresult "pyagent.attack_agent(run_no, p_id)")
+  if not is-down [ stop ]
+  set shape "a_victim"
+  ;; ask my-peer-cons [ set color red ] ;; TONOTE: Not necessary since incoming would still work (and be wasted cuz agent is down)
+end
+
+
+

@@ -1,13 +1,13 @@
 __includes [ "NetLogo/includes.nls" ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-135
-20
-572
-458
+1080
+10
+1764
+695
 -1
 -1
-13.0
+20.5
 1
 10
 1
@@ -28,10 +28,10 @@ ticks
 30.0
 
 BUTTON
-50
-79
-114
-112
+35
+45
+99
+78
 Setup
 setup
 NIL
@@ -45,10 +45,10 @@ NIL
 1
 
 BUTTON
-50
-130
-113
-163
+35
+85
+100
+118
 Go
 go
 NIL
@@ -62,11 +62,26 @@ NIL
 1
 
 OUTPUT
-575
-145
-815
-425
+15
+310
+840
+740
 11
+
+SLIDER
+20
+200
+465
+233
+No_of_Peers
+No_of_Peers
+0
+200
+20.0
+10
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -109,6 +124,26 @@ default
 true
 0
 Polygon -7500403 true true 150 5 40 250 150 205 260 250
+
+a_peer
+false
+0
+Polygon -14835848 true false 0 240 15 270 285 270 300 240 165 15 135 15
+
+a_server
+false
+0
+Rectangle -7500403 true true 15 15 285 210
+Polygon -7500403 true true 120 210 120 210 120 210 120 240 180 240 180 210 180 210 180 210
+Rectangle -7500403 true true 15 240 285 285
+Rectangle -10899396 true false 249 223 237 217
+
+a_victim
+false
+0
+Polygon -2674135 true false 0 240 15 270 285 270 300 240 165 15 135 15
+Polygon -16777216 true false 180 75 120 75 135 180 165 180
+Circle -16777216 true false 129 204 42
 
 airplane
 true
@@ -172,6 +207,16 @@ false
 Circle -7500403 true true 0 0 300
 Circle -16777216 true false 30 30 240
 
+computer workstation
+false
+0
+Rectangle -7500403 true true 60 45 240 180
+Polygon -7500403 true true 90 180 105 195 135 195 135 210 165 210 165 195 195 195 210 180
+Rectangle -16777216 true false 75 60 225 165
+Rectangle -7500403 true true 45 210 255 255
+Rectangle -10899396 true false 249 223 237 217
+Line -16777216 false 60 225 120 225
+
 cow
 false
 0
@@ -222,14 +267,6 @@ Polygon -1 true false 75 45 83 77 71 103 86 114 166 78 135 60
 Polygon -7500403 true true 30 136 151 77 226 81 280 119 292 146 292 160 287 170 270 195 195 210 151 212 30 166
 Circle -16777216 true false 215 106 30
 
-flag
-false
-0
-Rectangle -7500403 true true 60 15 75 300
-Polygon -7500403 true true 90 150 270 90 90 30
-Line -7500403 true 75 135 90 135
-Line -7500403 true 75 45 90 45
-
 flower
 false
 0
@@ -270,6 +307,18 @@ line half
 true
 0
 Line -7500403 true 150 0 150 150
+
+monster
+false
+0
+Polygon -7500403 true true 75 150 90 195 210 195 225 150 255 120 255 45 180 0 120 0 45 45 45 120
+Circle -16777216 true false 165 60 60
+Circle -16777216 true false 75 60 60
+Polygon -7500403 true true 225 150 285 195 285 285 255 300 255 210 180 165
+Polygon -7500403 true true 75 150 15 195 15 285 45 300 45 210 120 165
+Polygon -7500403 true true 210 210 225 285 195 285 165 165
+Polygon -7500403 true true 90 210 75 285 105 285 135 165
+Rectangle -7500403 true true 135 165 165 270
 
 pentagon
 false
@@ -383,6 +432,13 @@ Polygon -10899396 true false 105 90 75 75 55 75 40 89 31 108 39 124 60 105 75 10
 Polygon -10899396 true false 132 85 134 64 107 51 108 17 150 2 192 18 192 52 169 65 172 87
 Polygon -10899396 true false 85 204 60 233 54 254 72 266 85 252 107 210
 Polygon -7500403 true true 119 75 179 75 209 101 224 135 220 225 175 261 128 261 81 224 74 135 88 99
+
+warning
+false
+0
+Polygon -7500403 true true 0 240 15 270 285 270 300 240 165 15 135 15
+Polygon -16777216 true false 180 75 120 75 135 180 165 180
+Circle -16777216 true false 129 204 42
 
 wheel
 false
