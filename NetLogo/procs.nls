@@ -13,13 +13,8 @@ to setup
 end
 
 to go ; make sure everything is ready to go!
-  time:go-until 200 ;; time:go
-  ask peers [
-    output-print(list who transactions) ;; TODO
-  ]
-  ;; output-print (py:runresult "pyagent.test('Testing String')")
-  ;; py:set "x" "Python Variable" ;; Set python's "x" to string
-  ;; let temp (py:runresult "pyagent.test(x)")
+  time:go-until 300 ;; time:go
+  ;; ask peers [ output-print(list who transactions) ] ;; TODO
 end
 
 to set_constants
@@ -28,12 +23,14 @@ to set_constants
   set subdue-color 4
   set first-contact round (No_of_Peers / 10)
   ;; Network setup
-  set current_round 0
+  set current-round 0
+  set current-block-proposer-id ""
   set const-con-strength (list 1 10)
   set const-peers (list 2 4) 
   set const-attack-probabilities (list 0.01 1)
   ;; Timing setup
-  set new-transaction-generation-time 30
+  set new-transaction-generation-time 10 ;; TODO Increase if transaction propogation is used
+  set new-block-proposal-time 100
   set peer-breathe-time 2
 end
 
@@ -41,6 +38,8 @@ to setup_hosts
   ;; ask server 0  [ ... ]                  ;; tell the first one...
   ;; if breed = wolves [ ... ]
   ;; ask one-of wolves [ set breed sheep ]
+  ;; ask one-of peers [ ... ] 
+  ;; ask n-of 2 peers [ ... ] 
   ;; create the agents and give them random strategies
   ;; these are the only strategies these agents will ever have though they
   ;; can change which of this "bag of strategies" they use every tick
@@ -95,36 +94,39 @@ to setup_peers
       ;; set thickness delay /(last const-con-strength * 10) ;; TODO: Uncomment for visual confirmation
     ]   
   ]
-  ;; ask one-of peers [ ... ] ;; TODO: This line is for simple testing
-  ;; ask n-of 2 peers [ ... ] ;; TODO: This line is for simple testing
+  py:set "peers_list" [peer-id] of peers
+  py:run "pyagent.set_peer_list(run_no, peers_list)"
 end
 
 to initiate_round
-  set current_round (current_round + 1)
-  py:set "current_round" current_round
-  set current_block 0
+  set current-round (current-round + 1)
+  py:set "current_round" current-round
+  set current-block 0
   remove_attacker_influence
   py:set "attack_probability_range" const-attack-probabilities
   py:set "blocks_to_be_proposed" No_of_Peers
   py:run "pyagent.start_round(run_no, current_round, blocks_to_be_proposed, attack_probability_range)"
-  ask battacker [ set blocks_to_attack (py:runresult "pyagent.get_blocks_to_attack(run_no, current_round)")  ]
+  ask battacker [ set blocks-to-attack (py:runresult "pyagent.get_blocks_to_attack(run_no, current_round)")  ]
+  ;; TODO bring forward remaining transactions if any (Check Readme)
+  time:clear-schedule
   schedule_transaction_propogation_temp ;; TODO change for realistic simulation
-  ;; TODO bring forward remaining transactions if any, reschedule everything as a fresh start.
-  ;; TODO Schedule Initiate Block (Check Readme)
+  time:schedule-repeating-event "observer" [ [] -> initiate_block ] (ticks + new-block-proposal-time) new-block-proposal-time
 end
 
 to initiate_block
-  set current_block (current_block + 1)
-  if current_block > No_of_Peers [
+  set current-block (current-block + 1)
+  if current-block > No_of_Peers [
     initiate_round
     stop
   ]
   remove_attacker_influence
-  if member? current_block [blocks_to_attack] of battacker [ 
+  if member? current-block [blocks-to-attack] of battacker [
     ask battacker [
       ask attacker-con-neighbors [ attack_agent ]
     ]
   ]
+  set current-block-proposer-id get_proposer
+  ;; TODO NEXT PRIORITY 0 : Create Block, Transmit, etc
 end
 
 to remove_attacker_influence
@@ -135,6 +137,20 @@ to remove_attacker_influence
     set is-down False
     set shape "a_peer"
   ]
+end
+
+to-report get_proposer
+  py:set "prev_proposer_id" current-block-proposer-id
+  let candidate ""
+  while [candidate = ""] [
+    set candidate (py:runresult "pyagent.get_proposer(run_no, prev_proposer_id)")
+    ask peers with [peer-id = candidate] [
+      if is-down [ set candidate "" ]
+    ]
+  ]
+  py:set "curr_proposer_id" candidate
+  py:run "pyagent.complete_proposer_transfer(run_no, prev_proposer_id, curr_proposer_id)"
+  report candidate  
 end
 
 to attack_agent

@@ -6,6 +6,7 @@ networks = dict()
 def init_run(run_number):
     networks[run_number] = Network(run_number)
 
+
 def create_peer(run_number, node_id):
     return networks[run_number].create_peer(node_id)
 
@@ -36,8 +37,25 @@ def get_blocks_to_attack(run_number, curr_round):
     return networks[run_number].get_round(curr_round).get_attacking_rounds()
 
 
-def temp_print():
-    return  # TODO remove temporary debugger method
+def set_peer_list(run_number, peer_list):
+    peer_set = set(peer_list)
+    networks[run_number].set_peer_set(peer_set)
+
+
+def get_proposer(run_number, from_peer=""):
+    if from_peer == "":
+        return networks[run_number].get_proposer()
+    return networks[run_number].get_peer(from_peer).get_proposer()
+
+
+def complete_proposer_transfer(run_number, from_peer, to_peer):
+    networks[run_number].get_peer(to_peer).accept_proposer_position()
+    if from_peer != "":
+        networks[run_number].get_peer(from_peer).proposer_transfer_complete()
+
+
+def debug_print(output_var):  # TODO Remove
+    print(output_var)
 
 
 # if __name__ == '__main__':

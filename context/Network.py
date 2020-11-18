@@ -1,3 +1,5 @@
+import random
+
 from context.NetworkRound import NetworkRound
 from context.Peer import Peer
 from ledger.Transaction import Transaction
@@ -30,3 +32,10 @@ class Network:
 
     def get_round(self, curr_round):
         return self.rounds[curr_round]
+
+    def set_peer_set(self, peer_set):
+        for peer_id, peer_item in self.peers.items():
+            peer_item.set_peer_set(peer_set)
+
+    def get_proposer(self):  # For genesis block
+        return random.choice(list(self.peers.keys()))

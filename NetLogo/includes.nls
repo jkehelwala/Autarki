@@ -13,7 +13,7 @@ links-own [delay]
 
 
 attackers-own[
-  blocks_to_attack
+  blocks-to-attack
 ]
 
 peers-own [
@@ -34,14 +34,16 @@ globals [
   bserver 
   battacker 
   first-contact
-  current_round
-  current_block
+  current-round
+  current-block
+  current-block-proposer-id
   const-attack-probabilities
   const-con-strength 
   const-peers ;; (list min max)
   ;; 
   ;; Timing related
   new-transaction-generation-time
+  new-block-proposal-time
   peer-breathe-time
   ;; Visualization Related
   subdue-color ;;  To make non-neighbour links less visible

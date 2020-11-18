@@ -1,4 +1,5 @@
 import json
+import random
 import uuid
 
 from sortedcontainers import SortedDict
@@ -16,6 +17,9 @@ class Peer:
         self.blockchain = list()
         self.is_under_attack = False
         self.is_protected = False
+        self.proposers = list()
+        self.peer_set = set()
+        self.picked_proposer_set = set()
         self.state = None  # TODO
         self.strategy = None  # TODO
 
@@ -23,6 +27,7 @@ class Peer:
         self.is_under_attack = False
         self.is_protected = False
         self.set_protected()
+        self.proposers.clear()
 
     def set_transactions(self, transactions_json):
         if self.is_under_attack:
@@ -50,3 +55,31 @@ class Peer:
 
     def set_protected(self):
         self.is_protected = bool(self.who_id % 3 != 1)  # TODO pick value based on strategy and previous blocks
+
+    def set_peer_set(self, peer_set):
+        self.peer_set = peer_set
+
+    def get_proposer(self):
+        selected_proposer = None
+        leftover_proposers = self.peer_set - set(self.proposers) - self.picked_proposer_set
+        if len(leftover_proposers) > 0:
+            selected_proposer = random.choice(list(leftover_proposers))
+        elif len(self.proposers) > 0:
+            for candidate in self.proposers:
+                if candidate not in self.picked_proposer_set:
+                    selected_proposer = candidate
+                    break
+        if selected_proposer is None:  # Ambiguous situation for when lists are empty
+            leftover_proposers = self.peer_set - self.picked_proposer_set
+            if len(leftover_proposers) > 0:
+                selected_proposer = random.choice(list(leftover_proposers))
+            else:
+                selected_proposer = random.choice(list(self.peer_set))
+        self.picked_proposer_set.add(selected_proposer)
+        return selected_proposer
+
+    def proposer_transfer_complete(self):
+        self.picked_proposer_set.clear()
+
+    def accept_proposer_position(self):
+        self.picked_proposer_set.add(self.peer_id)
