@@ -12,8 +12,8 @@ to setup
   initiate_round
 end
 
-to go ; make sure everything is ready to go!
-  time:go-until 300 ;; time:go
+to go
+  time:go-until Duration ;; TODO or, until a bunch of rounds are completed.
   ;; ask peers [ output-print(list who transactions) ] ;; TODO
 end
 
@@ -21,7 +21,7 @@ to set_constants
   set-default-shape peers "a_peer"
   ;; Constant setup
   set subdue-color 4
-  set first-contact round (No_of_Peers / 10)
+  set first-contact round (No-of-Peers / 10)
   ;; Network setup
   set current-round 0
   set current-block-proposer-id ""
@@ -29,8 +29,8 @@ to set_constants
   set const-peers (list 2 4) 
   set const-attack-probabilities (list 0.01 1)
   ;; Timing setup
-  set new-transaction-generation-time 10 ;; TODO Increase if transaction propogation is used
-  set new-block-proposal-time 100
+  set new-transaction-generation-time 10 ;; TODO Increase if transaction propagation is used
+  set block-timeout 20
   set peer-breathe-time 2
 end
 
@@ -60,10 +60,11 @@ to setup_peers
   set bserver one-of servers
   set battacker one-of attackers
   ;; Creating Peers
-  create-peers No_of_Peers [
+  create-peers No-of-Peers [
     ;; set color turquoise
     setxy random-pxcor random-pycor
     set transactions "{}"
+    set block "{}"
     set is-down False
     set con-strength first const-con-strength +  random (last const-con-strength - first const-con-strength)
     set allowed-link-no first const-peers + random (last const-peers - first const-peers) 
@@ -95,7 +96,8 @@ to setup_peers
     ]   
   ]
   py:set "peers_list" [peer-id] of peers
-  py:run "pyagent.set_peer_list(run_no, peers_list)"
+  py:set "required_votes" Votes-Required ;; Percentage Conversion done inside python
+  py:run "pyagent.set_peer_network_variables(run_no, peers_list, required_votes)"
 end
 
 to initiate_round
@@ -104,18 +106,19 @@ to initiate_round
   set current-block 0
   remove_attacker_influence
   py:set "attack_probability_range" const-attack-probabilities
-  py:set "blocks_to_be_proposed" No_of_Peers
+  py:set "blocks_to_be_proposed" No-of-Peers
   py:run "pyagent.start_round(run_no, current_round, blocks_to_be_proposed, attack_probability_range)"
   ask battacker [ set blocks-to-attack (py:runresult "pyagent.get_blocks_to_attack(run_no, current_round)")  ]
   ;; TODO bring forward remaining transactions if any (Check Readme)
   time:clear-schedule
-  schedule_transaction_propogation_temp ;; TODO change for realistic simulation
-  time:schedule-repeating-event "observer" [ [] -> initiate_block ] (ticks + new-block-proposal-time) new-block-proposal-time
+  schedule_transaction_propagation_temp ;; TODO change for realistic simulation
+  schedule_block 10 ;; Start after at least 10 transactions
+  schedule_block_propogation
 end
 
 to initiate_block
   set current-block (current-block + 1)
-  if current-block > No_of_Peers [
+  if current-block > No-of-Peers [
     initiate_round
     stop
   ]
@@ -126,7 +129,44 @@ to initiate_block
     ]
   ]
   set current-block-proposer-id get_proposer
-  ;; TODO NEXT PRIORITY 0 : Create Block, Transmit, etc
+  py:set "curr_proposer_id" current-block-proposer-id
+  py:set "curr_time" ticks
+  ask peers with [peer-id = current-block-proposer-id ] [
+      set block (py:runresult "pyagent.get_new_block(run_no, curr_proposer_id, curr_time)")
+  ]
+end
+
+to schedule_block_propogation
+  ask peers [
+    time:schedule-repeating-event self [ [] -> push-peer-block ] ticks (con-strength)  ;; TODO this is the observer issue
+  ]
+end
+
+to push-peer-block ;; turtle-method
+  if block != "{}" and not is-down  [
+    let tmp_ticks ticks
+    py:set "proposed_block" block
+    ask out-peer-con-neighbors [
+      if is-down [stop]
+      py:set "p_id" [peer-id] of self
+      if block = "" [ output-print(word "Empty Block" [peer-id] of self)]
+      let temp-returned (py:runresult "pyagent.propagate_block_to_peer(run_no, p_id, proposed_block)")
+      let was-accepted first temp-returned
+      let temp-block last temp-returned
+      if temp-block != "" [
+        set block temp-block 
+      ]
+      if was-accepted and (current-block-proposer-id = peer-id) [
+          schedule_block 5 
+      ]
+    ]
+  ]
+end
+
+
+to schedule_block [tail]
+    let new-time (ticks + (new-transaction-generation-time * tail))
+    time:schedule-event "observer" [ [] -> initiate_block ] new-time  ;; Start after at least `tail` transactions
 end
 
 to remove_attacker_influence

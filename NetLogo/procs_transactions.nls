@@ -1,6 +1,6 @@
-;; Actual Scheduling of Transaction Propogation
+;; Actual Scheduling of Transaction Propagation
 
-to schedule_transaction_propogation
+to schedule_transaction_propagation
   let cur_time ticks
   time:schedule-repeating-event "observer" [ [] -> init_server_transaction ] cur_time new-transaction-generation-time ;; Initiate a new transaction every "new-transaction-generation-time" ticks 
   ask peers [
@@ -26,19 +26,19 @@ end
 to push_peer_transaction ;; turtle-method
   if is-down [ stop ]
   let tmp_ticks ticks
-  py:set "new_prop_tranasaction" transactions
+  py:set "new_prop_transaction" transactions
   ask my-out-peer-cons [
       if [is-down] of other-end [ stop ]
       time:schedule-event other-end ([ [] ->
         py:set "p_id" [peer-id] of self
-        set transactions (py:runresult "pyagent.propagate_to_peer(run_no, p_id, new_prop_tranasaction)")
+        set transactions (py:runresult "pyagent.propagate_to_peer(run_no, p_id, new_prop_transaction)")
       ]) (tmp_ticks + [delay] of self)
   ]
 end
 
-;; Scheduling of Direct Transaction Propogation from Server
+;; Scheduling of Direct Transaction Propagation from Server
 
-to schedule_transaction_propogation_temp
+to schedule_transaction_propagation_temp
   time:schedule-repeating-event "observer" [ [] -> init_server_transaction_temp ] ticks new-transaction-generation-time
 end
 

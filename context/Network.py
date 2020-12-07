@@ -1,4 +1,5 @@
 import random
+from math import ceil
 
 from context.NetworkRound import NetworkRound
 from context.Peer import Peer
@@ -11,6 +12,11 @@ class Network:
         self.transactions = dict()
         self.peers = dict()
         self.rounds = dict()
+
+    def print_chains(self):
+        for id_key, peer in self.peers.items():
+            print(peer)
+            peer.print_chain()
 
     def create_peer(self, node_id):
         peer = Peer(node_id)
@@ -33,9 +39,10 @@ class Network:
     def get_round(self, curr_round):
         return self.rounds[curr_round]
 
-    def set_peer_set(self, peer_set):
+    def set_peer_network_variables(self, peer_set, votes_required):
+        count_votes_required = ceil(len(self.peers) * float(votes_required))
         for peer_id, peer_item in self.peers.items():
-            peer_item.set_peer_set(peer_set)
+            peer_item.set_network_variables(peer_set, votes_required, count_votes_required)
 
     def get_proposer(self):  # For genesis block
         return random.choice(list(self.peers.keys()))

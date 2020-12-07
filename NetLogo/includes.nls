@@ -23,7 +23,7 @@ peers-own [
   is-down 
   is-protected
   transactions
-  history
+  block
   ;; strategies      ;; TODO list of strategies (from elfarol)
   ;; best-strategy   ;; TODO index of the current best strategy (from elfarol)
   ;; prediction      ;; TODO current prediction of the bar attendance
@@ -43,7 +43,7 @@ globals [
   ;; 
   ;; Timing related
   new-transaction-generation-time
-  new-block-proposal-time
+  block-timeout
   peer-breathe-time
   ;; Visualization Related
   subdue-color ;;  To make non-neighbour links less visible
