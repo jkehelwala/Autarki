@@ -28,7 +28,7 @@ to set_constants
   set const-con-strength (list 1 10)
   set const-peers (list 2 4) 
   set const-attack-probabilities (list 0.01 1)
-  ;; Timing setup
+  ;; Timing setup 
   set new-transaction-generation-time 10 ;; TODO Increase if transaction propagation is used
   set block-timeout 20
   set peer-breathe-time 2
