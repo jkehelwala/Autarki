@@ -1,4 +1,6 @@
-from context.Constants import const_none, LogConst, const_empty_json
+import logging.config
+
+from context.Constants import const_none, const_empty_json, const_log_file_name
 from context.Network import Network
 
 networks = dict()
@@ -6,6 +8,8 @@ networks = dict()
 
 def init_run(run_number):
     networks[run_number] = Network(run_number)
+    logfilename = const_log_file_name + "_R-%d.log" % run_number
+    logging.config.fileConfig('conf/log.conf', defaults={'logfilename': logfilename})
 
 
 def create_peer(run_number, node_id):
@@ -45,27 +49,20 @@ def set_peer_network_variables(run_number, peer_list, votes_required):
 
 def get_proposer(run_number, from_peer=const_none):
     if from_peer == const_none:
+        logging.debug("agent.get_proposer: First")
         return networks[run_number].get_proposer()
+    logging.debug("agent.get_proposer: Other")
     return networks[run_number].get_peer(from_peer).get_proposer()
 
 
 def complete_proposer_transfer(run_number, from_peer, to_peer):
+    logging.debug("agent.complete_proposer_transfer: %s to %s", from_peer, to_peer)
     networks[run_number].get_peer(to_peer).accept_proposer_position()
     if from_peer != const_none:
         networks[run_number].get_peer(from_peer).proposer_transfer_complete()
 
 
-def debug_log(output_var):  # TODO Remove
-    LogConst.log(output_var)
-
-
-# if __name__ == '__main__':
-#     peer = ContextPeer("test")
-#
-
-
 # Block Proposal
-
 def get_new_block(run_number, proposer_id, time_in_ticks):
     return networks[run_number].get_peer(proposer_id).propose_block(int(time_in_ticks))
 
@@ -78,5 +75,9 @@ def propagate_block_to_peer(run_number, peer_id, block_json):
     return network.get_peer(peer_id).get_current_block_json()
 
 
-def print_chains(run_number):
-    networks[run_number].print_chains()
+def log_agent_chains(run_number):
+    networks[run_number].log_network_chain()
+
+
+if __name__ == '__main__':
+    exit()

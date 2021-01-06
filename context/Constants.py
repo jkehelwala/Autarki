@@ -1,5 +1,9 @@
+from datetime import datetime
+
 const_none = ""
 const_empty_json = "{}"
+const_log_file_name = datetime.now().strftime("logs/%Y_%m_%d_%H_%M_%S")
+
 
 class BlockConst:
     index = "i"
@@ -10,8 +14,3 @@ class BlockConst:
     votes = "votes"
     proposer = "proposer"
 
-
-class LogConst:
-    @classmethod
-    def log(cls, str_line):
-        print(str_line)

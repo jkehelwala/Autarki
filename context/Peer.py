@@ -1,9 +1,10 @@
 import json
+import logging
 import random
 import uuid
 from collections import defaultdict
 
-from context.Constants import const_none, LogConst
+from context.Constants import const_none
 from ledger.Block import Block
 
 
@@ -25,8 +26,11 @@ class Peer:
         self.state = None  # TODO
         self.strategy = None  # TODO
 
-    def print_chain(self):
-        print(self.who_id, self.blockchain)
+    def log_chain(self):
+        logging.debug("Peer.print_chain: Begin %s, %s", self.who_id, self.peer_id)
+        for block_item in self.blockchain:
+            block_item.log_block_string()
+        logging.debug("Peer.print_chain: End %s, %s", self.who_id, self.peer_id)
 
     def start_round(self):
         self.is_under_attack = False
@@ -83,6 +87,7 @@ class Peer:
             else:
                 selected_proposer = random.choice(list(self.__peer_set))
         self.picked_proposer_set.add(selected_proposer)
+        logging.debug("Peer.get_proposer: %s", selected_proposer)
         return selected_proposer
 
     def proposer_transfer_complete(self):
@@ -98,7 +103,7 @@ class Peer:
         new_block_index = len(self.blockchain)
         block = Block(new_block_index, self.transactions, ticks,
                       self.previous_block_signature, self.peer_id)
-        LogConst.log(block.get_json())
+        logging.debug("Peer.propose_block: %s", block.get_json())
         return block.get_json()
 
     def accept_block(self):

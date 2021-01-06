@@ -58,16 +58,10 @@ class Block:
 
     @classmethod
     def from_json(cls, json_string):
-        new_block = None
-        try:
-            block = json.loads(json_string)
-            new_block = cls(block[BlockConst.index], block[BlockConst.transactions], block[BlockConst.timestamp],
-                            block[BlockConst.previous_hash], block[BlockConst.proposer])
-            new_block.set_votes(block[BlockConst.votes])
-        except JSONDecodeError as e:
-            print("Begin", json_string)
-            print(e)
-            raise Exception("Hit")
+        block = json.loads(json_string)  # TODO Note JSONDecodeError could occur
+        new_block = cls(block[BlockConst.index], block[BlockConst.transactions], block[BlockConst.timestamp],
+                        block[BlockConst.previous_hash], block[BlockConst.proposer])
+        new_block.set_votes(block[BlockConst.votes])
         return new_block
 
     def verify(self, prev_hash, voter_transactions):

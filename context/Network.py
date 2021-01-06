@@ -1,3 +1,4 @@
+import logging
 import random
 from math import ceil
 
@@ -13,10 +14,9 @@ class Network:
         self.peers = dict()
         self.rounds = dict()
 
-    def print_chains(self):
+    def log_network_chain(self):
         for id_key, peer in self.peers.items():
-            print(peer)
-            peer.print_chain()
+            peer.log_chain()
 
     def create_peer(self, node_id):
         peer = Peer(node_id)
@@ -45,4 +45,6 @@ class Network:
             peer_item.set_network_variables(peer_set, votes_required, count_votes_required)
 
     def get_proposer(self):  # For genesis block
-        return random.choice(list(self.peers.keys()))
+        proposer = random.choice(list(self.peers.keys()))
+        logging.debug("Network.get_proposer: %s", proposer)
+        return proposer
