@@ -34,17 +34,6 @@ to set_constants
   set peer-breathe-time 2
 end
 
-to setup_hosts
-  ;; ask server 0  [ ... ]                  ;; tell the first one...
-  ;; if breed = wolves [ ... ]
-  ;; ask one-of wolves [ set breed sheep ]
-  ;; ask one-of peers [ ... ] 
-  ;; ask n-of 2 peers [ ... ] 
-  ;; create the agents and give them random strategies
-  ;; these are the only strategies these agents will ever have though they
-  ;; can change which of this "bag of strategies" they use every tick
-end
-
 to setup_peers
   ;; Creating Servers
   create-servers 1 [
@@ -146,20 +135,45 @@ to push-peer-block ;; turtle-method
   if block != "{}" and not is-down  [
     let tmp_ticks ticks
     py:set "proposed_block" block
+    py:set "sending_peer" [peer-id] of self ;; For request-blockchain method
     ask out-peer-con-neighbors [
       if is-down [stop]
       py:set "p_id" [peer-id] of self
-      if block = "" [ output-print(word "Empty Block" [peer-id] of self)]
       let temp-returned (py:runresult "pyagent.propagate_block_to_peer(run_no, p_id, proposed_block)")
-      let was-accepted first temp-returned
-      let temp-block last temp-returned
-      if temp-block != "" [
-        set block temp-block 
+      let was-processed first temp-returned
+      let process-returns last temp-returned
+      if not was-processed [
+        ifelse process-returns != "" [
+          request-blockchain first process-returns last process-returns
+          set temp-returned (py:runresult "pyagent.propagate_block_to_peer(run_no, p_id, proposed_block)")
+          set was-processed first temp-returned
+          set process-returns last temp-returned
+        ]
+        [
+          output-print(word "Empty Block" [peer-id] of self) ;; TODO exit here? Priority #2 
+          stop
+        ]
       ]
-      if was-accepted and (current-block-proposer-id = peer-id) [
-          schedule_block 5 
+      if was-processed [
+        let was-accepted first process-returns
+        let temp-block last process-returns
+        if temp-block != "" [
+          set block temp-block
+        ]
+        if was-accepted and (current-block-proposer-id = peer-id) [
+          schedule_block 5
+        ]
       ]
     ]
+  ]
+end
+
+to request-blockchain [from_index to_index] ;; turtle-method
+  py:set "update_index_to" to_index
+  py:set "update_index_from" from_index
+  let transfer-success (py:runresult "pyagent.blockchain_request(run_no, p_id, sending_peer, update_index_from, update_index_to)") ;; TODO Change to most available peer if necessary
+  if not transfer-success [
+    output-print(word "Blockchain transfer successful :" transfer-success)
   ]
 end
 

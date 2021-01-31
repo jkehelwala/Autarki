@@ -68,11 +68,22 @@ def get_new_block(run_number, proposer_id, time_in_ticks):
 
 
 def propagate_block_to_peer(run_number, peer_id, block_json):
-    if block_json == const_empty_json:
-        return ""
+    if block_json == const_empty_json or block_json == "":
+        logging.debug("agent.propagate_block_to_peer: Empty Json. %s", peer_id)
+        return [False, ""]
     network = networks[run_number]
-    network.get_peer(peer_id).update_current_block(block_json)
-    return network.get_peer(peer_id).get_current_block_json()
+    blockchain_up_to_date, from_to_index = network.get_peer(peer_id).update_current_block(block_json)
+    if not blockchain_up_to_date:
+        logging.debug("agent.propagate_block_to_peer: Needs to update Blockchain.")
+        return [False, from_to_index]
+    return [True, network.get_peer(peer_id).get_current_block_json()]
+
+
+def blockchain_request(run_number, requesting_peer, responding_peer, index_from, index_to):
+    network = networks[run_number]
+    blockchain_slice = network.get_peer(responding_peer).get_blockchain_slice(index_from, index_to)
+    updated_up_to = network.get_peer(requesting_peer).set_blockchain_slice(index_from, blockchain_slice)
+    return updated_up_to == index_to
 
 
 def log_agent_chains(run_number):
@@ -80,4 +91,6 @@ def log_agent_chains(run_number):
 
 
 if __name__ == '__main__':
+    # init_run(0)
+    # logging.debug("test")
     exit()

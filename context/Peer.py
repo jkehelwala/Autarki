@@ -12,7 +12,7 @@ class Peer:
     def __init__(self, who_id):
         self.who_id = who_id  # Constant NetLogo Id For Reference only
         self.peer_id = str(uuid.uuid4())
-        self.transactions = defaultdict(list) # TODO
+        self.transactions = defaultdict(list)  # TODO
         self.blockchain = list()
         self.is_under_attack = False
         self.is_protected = False
@@ -58,6 +58,8 @@ class Peer:
 
     def set_under_attack(self):
         self.is_under_attack = not self.is_protected
+        if self.is_under_attack:
+            logging.debug("Peer.set_under_attack: %s", self.who_id)
         return self.is_under_attack
 
     def unset_under_attack(self):
@@ -107,8 +109,11 @@ class Peer:
         return block.get_json()
 
     def accept_block(self):
+        logging.debug("Peer.accept_block")
         if self.current_block.vote_count() < self.__votes_required:
             return False
+        logging.debug("Peer.accept_block : Enough votes received. Accepting Block. Votes: %d/%d, By: %s",
+                      self.current_block.vote_count(), self.__votes_required, self.who_id)
         self.blockchain.append(self.current_block)
         self.previous_block_signature = self.current_block.block_signature()
         self.purge_committed_transactions()
@@ -124,15 +129,36 @@ class Peer:
                 self.current_block = eval_block
                 self.current_block_accepted = False
             if len(self.blockchain) < index:
-                pass  # TODO request blockchain from neighbors
+                logging.info("Peer.update_current_block: Needs to obtain blockchain")
+                return False, [len(self.blockchain), index - 1]  # TODO request blockchain from neighbors
         if not self.current_block_accepted:
             verified_votes = self.current_block.update_votes(block_json, self.__peer_set)
         if verified_votes:
             self.current_block.vote(self.peer_id)
             self.accept_block()  # TODO voting in order for reputation collection, UniqueList?
+        return True, 0
 
     def get_current_block_json(self):
         json_output = ""
         if self.current_block is not None:
             json_output = self.current_block.get_json()
+        if self.current_block_accepted:
+            logging.debug("Peer.get_current_block_json: Block Added Successfully")
         return [self.current_block_accepted, json_output]
+
+    def get_blockchain_slice(self, index_from, index_to):
+        logging.debug("Peer.get_blockchain_slice: Sending blocks from %d to %d from %s", index_from, index_to,
+                      self.peer_id)
+        if self.blockchain[index_from].index == index_from and self.blockchain[index_to].index == index_to:
+            logging.debug("Peer.get_blockchain_slice: Slice Accurate")
+        else:
+            logging.debug("Peer.get_blockchain_slice: Slice Inaccurate")
+        return self.blockchain[index_from: index_to]
+
+    def set_blockchain_slice(self, index_from, blockchain_slice):
+        self.blockchain.extend(blockchain_slice)
+        # TODO - Priority Index Out of Range issue IndexError: list index out of range
+        logging.debug("Peer.set_blockchain_slice: Added blocks from %d to %d from %s", index_from,
+                      self.blockchain[len(self.blockchain) - 1].index,
+                      self.peer_id)
+        return len(self.blockchain) - 1

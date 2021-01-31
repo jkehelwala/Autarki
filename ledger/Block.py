@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import logging
 from json import JSONDecodeError
 
 from context.Constants import BlockConst
@@ -27,6 +28,17 @@ class Block:
 
     def get_transaction_keys(self):
         return self.transactions.keys()
+
+    def log_block_string(self):
+        json_dict = {
+            BlockConst.index: self.index,
+            BlockConst.timestamp: self.timestamp,
+            BlockConst.proposer: self.proposer,
+            BlockConst.previous_hash: self.previous_hash,
+            BlockConst.signature: self.signature,
+            # BlockConst.votes: ",".join(list(self.votes))
+        }
+        logging.debug(json.dumps(json_dict))  # TODO  BlockConst.transactions
 
     def get_json(self):
         json_dict = {
