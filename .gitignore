@@ -1,4 +1,5 @@
 __pycache__/
 .idea/
-conf/
 autarki.sublime-*
+logs/
+ledger/State
