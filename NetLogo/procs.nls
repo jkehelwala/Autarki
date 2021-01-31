@@ -14,6 +14,9 @@ end
 
 to go
   time:go-until Duration ;; TODO or, until a bunch of rounds are completed.
+  output-print(word "Current Round - " current-round)
+  output-print(word "Current Block - " current-block)
+  ;; py:run "pyagent.log_agent_chains(run_no)"
   ;; ask peers [ output-print(list who transactions) ] ;; TODO
 end
 
@@ -107,6 +110,7 @@ end
 
 to initiate_block
   set current-block (current-block + 1)
+  output-print(word "round # " current-block)
   if current-block > No-of-Peers [
     initiate_round
     stop
@@ -120,6 +124,7 @@ to initiate_block
   set current-block-proposer-id get_proposer
   py:set "curr_proposer_id" current-block-proposer-id
   py:set "curr_time" ticks
+  output-print(word "start_block" ticks)
   ask peers with [peer-id = current-block-proposer-id ] [
       set block (py:runresult "pyagent.get_new_block(run_no, curr_proposer_id, curr_time)")
   ]
@@ -161,7 +166,11 @@ to push-peer-block ;; turtle-method
           set block temp-block
         ]
         if was-accepted and (current-block-proposer-id = peer-id) [
-          schedule_block 5
+          let time_began (py:runresult "curr_time")
+          output-print(word "end_block" (ticks - time_began))
+          if ticks - time_began > 15 [
+            schedule_block 5
+          ]
         ]
       ]
     ]
@@ -204,6 +213,7 @@ to-report get_proposer
   ]
   py:set "curr_proposer_id" candidate
   py:run "pyagent.complete_proposer_transfer(run_no, prev_proposer_id, curr_proposer_id)"
+  output-print(word "candidate " candidate)
   report candidate  
 end
 

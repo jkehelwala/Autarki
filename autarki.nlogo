@@ -77,7 +77,7 @@ No-of-Peers
 No-of-Peers
 0
 200
-5.0
+10.0
 5
 1
 NIL
@@ -92,8 +92,8 @@ Votes-Required
 Votes-Required
 51
 100
-51.0
-0.01
+66.0
+5
 1
 %
 HORIZONTAL
@@ -107,7 +107,7 @@ Duration
 Duration
 200
 1000
-200.0
+300.0
 100
 1
 ticks

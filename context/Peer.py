@@ -109,7 +109,7 @@ class Peer:
         return block.get_json()
 
     def accept_block(self):
-        logging.debug("Peer.accept_block")
+        # logging.debug("Peer.accept_block")
         if self.current_block.vote_count() < self.__votes_required:
             return False
         logging.debug("Peer.accept_block : Enough votes received. Accepting Block. Votes: %d/%d, By: %s",
@@ -143,7 +143,8 @@ class Peer:
         if self.current_block is not None:
             json_output = self.current_block.get_json()
         if self.current_block_accepted:
-            logging.debug("Peer.get_current_block_json: Block Added Successfully")
+            # logging.debug("Peer.get_current_block_json: Block Added Successfully")
+            pass
         return [self.current_block_accepted, json_output]
 
     def get_blockchain_slice(self, index_from, index_to):

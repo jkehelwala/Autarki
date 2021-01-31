@@ -12,6 +12,10 @@ but this is too much processing for the single threaded simulation
 ## TODO
 - [ ] Request Blockchain from the most available peer instead of the one who propogated 
 - [ ] Currently picks transactions obtained before proposer tick time.
+
+## TODO Immediately
+- [ ] Fix infinite Loop propagate_block_to_peer Check the respective Netlogo Code as well 
+
 ## Generic
 
 Game repeated in sets of "n" consensus rounds. 
