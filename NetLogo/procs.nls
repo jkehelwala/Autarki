@@ -24,14 +24,14 @@ to set_constants
   set-default-shape peers "a_peer"
   ;; Constant setup
   set subdue-color 4
-  set first-contact round (No-of-Peers / 10)
-  ;; Network setup
   set current-round 0
   set current-block-proposer-id ""
-  set const-con-strength (list 1 10)
-  set const-peers (list 2 4) 
-  set const-attack-probabilities (list 0.01 1)
-  ;; Timing setup 
+  ;; Network setup
+  set first-contact round (No-of-Peers / 10) ;; TODO Move to UI
+  set const-con-strength (list 1 10) ;; TODO Move to UI
+  set const-peers (list 2 4)  ;; TODO Move to UI
+  set const-attack-probabilities (list 0.01 1) ;; TODO Move to UI (only Minimum attack probability)
+  ;; Timing setup
   set new-transaction-generation-time 10 ;; TODO Increase if transaction propagation is used
   set block-timeout 20
   set peer-breathe-time 2

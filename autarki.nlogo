@@ -85,15 +85,15 @@ HORIZONTAL
 
 SLIDER
 220
-90
+95
 665
-123
+128
 Votes-Required
 Votes-Required
-51
-100
-66.0
-5
+50.01
+99
+66.67
+0.01
 1
 %
 HORIZONTAL
@@ -112,6 +112,43 @@ Duration
 1
 ticks
 HORIZONTAL
+
+SWITCH
+680
+95
+840
+128
+Heterogeneous-Cost
+Heterogeneous-Cost
+1
+1
+-1000
+
+SLIDER
+680
+145
+840
+178
+Benefit-Per-Unit-Of-Cost
+Benefit-Per-Unit-Of-Cost
+1
+10
+3.0
+1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+680
+40
+840
+85
+Learning-Methodology
+Learning-Methodology
+"Reputation Maximization" "Regret Matching" "Bounded Rationality"
+0
+
 
 @#$#@#$#@
 ## WHAT IS IT?
