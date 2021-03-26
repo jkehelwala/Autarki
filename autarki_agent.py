@@ -64,6 +64,7 @@ def complete_proposer_transfer(run_number, from_peer, to_peer):
 
 # Block Proposal
 def get_new_block(run_number, proposer_id, time_in_ticks):
+    networks[run_number].set_curr_block_timeout()
     return networks[run_number].get_peer(proposer_id).propose_block(int(time_in_ticks))
 
 
@@ -88,6 +89,22 @@ def blockchain_request(run_number, requesting_peer, responding_peer, index_from,
 
 def log_agent_chains(run_number):
     networks[run_number].log_network_chain()
+
+
+def notify_proposer(run_number, proposer, added_by_peer):
+    networks[run_number].get_peer(proposer).collect_added_vote(added_by_peer)
+
+
+def check_proposed_block_status(run_number, proposer):
+    return networks[run_number].get_peer(proposer).check_proposed_block_status()
+
+
+def set_block_timeout(run_number, timeout_in_secs):
+    networks[run_number].set_block_timeout(timeout_in_secs)
+
+
+def if_block_timed_out(run_number):
+    return networks[run_number].is_block_timed_out()
 
 
 if __name__ == '__main__':

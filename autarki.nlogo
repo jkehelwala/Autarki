@@ -1,9 +1,9 @@
 __includes [ "NetLogo/includes.nls" ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-1080
+1200
 10
-1764
+1884
 695
 -1
 -1
@@ -77,7 +77,7 @@ No-of-Peers
 No-of-Peers
 0
 200
-10.0
+100.0
 5
 1
 NIL
@@ -92,25 +92,10 @@ Votes-Required
 Votes-Required
 50.01
 99
-66.67
+66.99
 0.01
 1
 %
-HORIZONTAL
-
-SLIDER
-220
-145
-665
-178
-Duration
-Duration
-200
-1000
-300.0
-100
-1
-ticks
 HORIZONTAL
 
 SWITCH
@@ -149,6 +134,45 @@ Learning-Methodology
 "Reputation Maximization" "Regret Matching" "Bounded Rationality"
 0
 
+TEXTBOX
+75
+465
+485
+630
+TODO: Move certain variables in procs to UI\n\nHow many peers to contact at first round\nConnection Strength to assign to peers (min, max)\nPeer connections allowed (min, max)\nMinimum attack probability\n\nTODO: Other notes\nrounds over duration and move that part away\ntimeouts for txnGeneration, etc
+11
+63.0
+0
+
+SLIDER
+865
+45
+1097
+78
+Block-Timeout
+Block-Timeout
+0
+1000
+600.0
+5
+1
+seconds
+HORIZONTAL
+
+SLIDER
+220
+145
+665
+178
+Duration
+Duration
+200
+10000
+300.0
+100
+1
+ticks
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -533,7 +557,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

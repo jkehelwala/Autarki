@@ -43,7 +43,7 @@ globals [
   ;; 
   ;; Timing related
   new-transaction-generation-time
-  block-timeout
+  ;; block-timeout block-start-time ;; for ticks (not used atm)
   peer-breathe-time
   ;; Visualization Related
   subdue-color ;;  To make non-neighbour links less visible

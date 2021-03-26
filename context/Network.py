@@ -1,5 +1,6 @@
 import logging
 import random
+import time
 from math import ceil
 
 from context.NetworkRound import NetworkRound
@@ -13,6 +14,8 @@ class Network:
         self.transactions = dict()
         self.peers = dict()
         self.rounds = dict()
+        self.block_timeout = None
+        self.curr_block_timeout = None
 
     def log_network_chain(self):
         for id_key, peer in self.peers.items():
@@ -48,3 +51,13 @@ class Network:
         proposer = random.choice(list(self.peers.keys()))
         logging.debug("Network.get_proposer: %s", proposer)
         return proposer
+
+    def set_block_timeout(self, timeout_in_secs):
+        self.block_timeout = timeout_in_secs
+
+    def set_curr_block_timeout(self):
+        logging.debug("Network.set_curr_block_timeout")
+        self.curr_block_timeout = time.time() + self.block_timeout
+
+    def is_block_timed_out(self):
+        return time.time() > self.curr_block_timeout

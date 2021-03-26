@@ -13,7 +13,7 @@ to setup
 end
 
 to go
-  time:go-until Duration ;; TODO or, until a bunch of rounds are completed.
+  time:go-until Duration;; (ticks)
   output-print(word "Current Round - " current-round)
   output-print(word "Current Block - " current-block)
   ;; py:run "pyagent.log_agent_chains(run_no)"
@@ -33,7 +33,8 @@ to set_constants
   set const-attack-probabilities (list 0.01 1) ;; TODO Move to UI (only Minimum attack probability)
   ;; Timing setup
   set new-transaction-generation-time 10 ;; TODO Increase if transaction propagation is used
-  set block-timeout 20
+  py:set "timeout_in_seconds" Block-Timeout
+  py:run "pyagent.set_block_timeout(run_no, timeout_in_seconds)"
   set peer-breathe-time 2
 end
 
@@ -102,15 +103,24 @@ to initiate_round
   py:run "pyagent.start_round(run_no, current_round, blocks_to_be_proposed, attack_probability_range)"
   ask battacker [ set blocks-to-attack (py:runresult "pyagent.get_blocks_to_attack(run_no, current_round)")  ]
   ;; TODO bring forward remaining transactions if any (Check Readme)
+  reschedule_events 10 ;; Start after at least 10 transactions 
+end
+
+to reschedule_events [block_count]
   time:clear-schedule
   schedule_transaction_propagation_temp ;; TODO change for realistic simulation
-  schedule_block 10 ;; Start after at least 10 transactions
-  schedule_block_propogation
+  schedule_block block_count ;; Start after at least 10 transactions
+  ;; ask peers [ time:schedule-repeating-event self [ [] -> push-peer-block ] ticks (con-strength) ] ;; TODO (Not suitable)
+end
+
+to schedule_block [tail]
+    let new-time (ticks + (new-transaction-generation-time * tail))
+    time:schedule-event "observer" [ [] -> initiate_block ] new-time  ;; Start after at least `tail` transactions
 end
 
 to initiate_block
   set current-block (current-block + 1)
-  output-print(word "round # " current-block)
+  output-print(word "Round: " current-round " Block: " current-block)
   if current-block > No-of-Peers [
     initiate_round
     stop
@@ -124,55 +134,60 @@ to initiate_block
   set current-block-proposer-id get_proposer
   py:set "curr_proposer_id" current-block-proposer-id
   py:set "curr_time" ticks
-  output-print(word "start_block" ticks)
+  output-print(word "start_block " ticks)
   ask peers with [peer-id = current-block-proposer-id ] [
-      set block (py:runresult "pyagent.get_new_block(run_no, curr_proposer_id, curr_time)")
+    set block (py:runresult "pyagent.get_new_block(run_no, curr_proposer_id, curr_time)")
+    push-peer-block
   ]
 end
 
-to schedule_block_propogation
-  ask peers [
-    time:schedule-repeating-event self [ [] -> push-peer-block ] ticks (con-strength)  ;; TODO this is the observer issue
+to receive-block [proposed-block sending-peer]
+  if is-down [stop]
+  let is-block-timeout (py:runresult "pyagent.if_block_timed_out(run_no)")
+  if is-block-timeout [
+    reschedule_events 5
+    stop
+  ]
+  let tmp_ticks ticks
+  py:set "p_id" [peer-id] of self
+  let temp-returned (py:runresult "pyagent.propagate_block_to_peer(run_no, p_id, proposed_block)")
+  let was-processed first temp-returned
+  let process-returns last temp-returned
+  if not was-processed [
+    ifelse process-returns != "" [
+      request-blockchain first process-returns last process-returns
+      ;; receive-block proposed-block sending-peer ;; TODO Fix possible infinite loop and index out of range issue
+    ]
+    [
+      output-print(word "Empty Block" [peer-id] of self) ;; TODO exit here? Priority #2 
+      stop
+    ]
+  ]
+  if was-processed [
+    let was-accepted first process-returns
+    let temp-block last process-returns
+    py:set "curr_proposer_id" current-block-proposer-id
+    if temp-block != "" [
+      set block temp-block
+      py:run "pyagent.notify_proposer(run_no, curr_proposer_id, p_id)" ;; For termination purposes. This could be done via python itself but we add here for realistic purposes
+      time:schedule-event self [ [] -> push-peer-block ] (tmp_ticks + con-strength) ;; TODO This is problematic
+    ]
+    if was-accepted and (current-block-proposer-id = peer-id) [
+      ;; Note: For simulation (early) round termination purposes. Not an implementation of Blockchain (Votes <> Block is added enough times)
+      let block_in_chain (py:runresult "pyagent.check_proposed_block_status(run_no, curr_proposer_id)")
+      if block_in_chain [
+        reschedule_events 5
+      ]
+    ]
   ]
 end
 
 to push-peer-block ;; turtle-method
   if block != "{}" and not is-down  [
-    let tmp_ticks ticks
     py:set "proposed_block" block
     py:set "sending_peer" [peer-id] of self ;; For request-blockchain method
     ask out-peer-con-neighbors [
-      if is-down [stop]
-      py:set "p_id" [peer-id] of self
-      let temp-returned (py:runresult "pyagent.propagate_block_to_peer(run_no, p_id, proposed_block)")
-      let was-processed first temp-returned
-      let process-returns last temp-returned
-      if not was-processed [
-        ifelse process-returns != "" [
-          request-blockchain first process-returns last process-returns
-          set temp-returned (py:runresult "pyagent.propagate_block_to_peer(run_no, p_id, proposed_block)")
-          set was-processed first temp-returned
-          set process-returns last temp-returned
-        ]
-        [
-          output-print(word "Empty Block" [peer-id] of self) ;; TODO exit here? Priority #2 
-          stop
-        ]
-      ]
-      if was-processed [
-        let was-accepted first process-returns
-        let temp-block last process-returns
-        if temp-block != "" [
-          set block temp-block
-        ]
-        if was-accepted and (current-block-proposer-id = peer-id) [
-          let time_began (py:runresult "curr_time")
-          output-print(word "end_block" (ticks - time_began))
-          if ticks - time_began > 15 [
-            schedule_block 5
-          ]
-        ]
-      ]
+      receive-block block [peer-id] of self
     ]
   ]
 end
@@ -184,12 +199,6 @@ to request-blockchain [from_index to_index] ;; turtle-method
   if not transfer-success [
     output-print(word "Blockchain transfer successful :" transfer-success)
   ]
-end
-
-
-to schedule_block [tail]
-    let new-time (ticks + (new-transaction-generation-time * tail))
-    time:schedule-event "observer" [ [] -> initiate_block ] new-time  ;; Start after at least `tail` transactions
 end
 
 to remove_attacker_influence

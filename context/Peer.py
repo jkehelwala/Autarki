@@ -25,6 +25,8 @@ class Peer:
         self.previous_block_signature = "-1"  # TODO Note genesis block
         self.state = None  # TODO
         self.strategy = None  # TODO
+        self.proposed_accepted_list = list()  # Only used when self is the proposer. Simulation termination purposes
+        self.proposer_accepted = False
 
     def log_chain(self):
         logging.debug("Peer.print_chain: Begin %s, %s", self.who_id, self.peer_id)
@@ -96,6 +98,7 @@ class Peer:
         self.picked_proposer_set.clear()
 
     def accept_proposer_position(self):
+        self.proposed_accepted_list.clear()
         self.picked_proposer_set.add(self.peer_id)
 
     def propose_block(self, ticks):
@@ -163,3 +166,11 @@ class Peer:
                       self.blockchain[len(self.blockchain) - 1].index,
                       self.peer_id)
         return len(self.blockchain) - 1
+    def collect_added_vote(self, added_by_peer):
+        self.proposed_accepted_list.append(added_by_peer)
+
+    def check_proposed_block_status(self):
+        if not self.proposer_accepted:
+            self.proposer_accepted = len(self.proposed_accepted_list) >= self.__votes_required
+            logging.debug("Peer.check_proposed_block_status: %s", self.proposer_accepted)
+        return self.proposer_accepted

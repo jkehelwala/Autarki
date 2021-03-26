@@ -14,7 +14,8 @@ but this is too much processing for the single threaded simulation
 - [ ] Currently picks transactions obtained before proposer tick time.
 
 ## TODO Immediately
-- [ ] Fix infinite Loop propagate_block_to_peer Check the respective Netlogo Code as well 
+- [x] Fix infinite Loop propagate_block_to_peer Check the respective Netlogo Code as well 
+- [x] `is_down` not working issue. (Fixed via clear_schedule)          
 
 ## Generic
 
