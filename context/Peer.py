@@ -161,11 +161,16 @@ class Peer:
 
     def set_blockchain_slice(self, index_from, blockchain_slice):
         self.blockchain.extend(blockchain_slice)
-        # TODO - Priority Index Out of Range issue IndexError: list index out of range
+        logging.debug(blockchain_slice)
+        try:
+            index_to = self.blockchain[len(self.blockchain) - 1].index
+        except IndexError:
+            logging.debug("Exception: Index out of range err. Blockchain Index: %d", len(self.blockchain) - 1)
+            index_to = 0
         logging.debug("Peer.set_blockchain_slice: Added blocks from %d to %d from %s", index_from,
-                      self.blockchain[len(self.blockchain) - 1].index,
-                      self.peer_id)
+                      index_to, self.peer_id)
         return len(self.blockchain) - 1
+
     def collect_added_vote(self, added_by_peer):
         self.proposed_accepted_list.append(added_by_peer)
 
