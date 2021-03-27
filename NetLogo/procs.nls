@@ -196,11 +196,16 @@ to receive-block [proposed-block sending-peer]
       py:run "pyagent.notify_proposer(run_no, curr_proposer_id, p_id)" ;; For termination purposes. This could be done via python itself but we add here for realistic purposes
       time:schedule-event self [ [] -> push-peer-block ] (tmp_ticks + con-strength) ;; TODO This is problematic
     ]
-    if was-accepted and (current-block-proposer-id = peer-id) [
-      ;; Note: For simulation (early) round termination purposes. Not an implementation of Blockchain (Votes <> Block is added enough times)
-      let block_in_chain (py:runresult "pyagent.check_proposed_block_status(run_no, curr_proposer_id)")
-      if block_in_chain [
-        reschedule_events 5
+    if was-accepted [
+      ;; NOTE: For simulation (early) block termination purposes
+      ifelse (current-block-proposer-id = peer-id) [
+        let block_in_chain (py:runresult "pyagent.check_proposed_block_status(run_no, curr_proposer_id)")
+        if block_in_chain [
+          reschedule_events 5
+        ]
+      ]
+      [
+        py:run "pyagent.notify_proposer(run_no, curr_proposer_id, p_id)"
       ]
     ]
   ]
