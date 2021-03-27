@@ -2,6 +2,7 @@ import logging.config
 
 from context.Constants import const_none, const_empty_json, const_log_file_name
 from context.Network import Network
+from ledger.Block import Block
 
 networks = dict()
 
@@ -105,6 +106,14 @@ def set_block_timeout(run_number, timeout_in_secs):
 
 def if_block_timed_out(run_number):
     return networks[run_number].is_block_timed_out()
+
+
+def get_no_of_votes(current_block):
+    try:
+        votes = Block.from_json(current_block).vote_count()
+    except TypeError:
+        votes = 0
+    return votes
 
 
 if __name__ == '__main__':

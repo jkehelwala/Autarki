@@ -77,7 +77,7 @@ No-of-Peers
 No-of-Peers
 0
 200
-100.0
+20.0
 5
 1
 NIL
@@ -135,10 +135,10 @@ Learning-Methodology
 0
 
 TEXTBOX
-75
-465
-485
-630
+870
+240
+1150
+405
 TODO: Move certain variables in procs to UI\n\nHow many peers to contact at first round\nConnection Strength to assign to peers (min, max)\nPeer connections allowed (min, max)\nMinimum attack probability\n\nTODO: Other notes\nrounds over duration and move that part away\ntimeouts for txnGeneration, etc
 11
 63.0
@@ -153,7 +153,7 @@ Block-Timeout
 Block-Timeout
 0
 1000
-600.0
+10.0
 5
 1
 seconds
@@ -168,11 +168,52 @@ Duration
 Duration
 200
 10000
-300.0
+400.0
 100
 1
 ticks
 HORIZONTAL
+
+PLOT
+640
+475
+1070
+645
+Block Acceptance
+Block
+Votes
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"Obtained" 1.0 0 -5298144 true "" ""
+"Required" 1.0 0 -16777216 true "" "plotxy overall-block Votes-Required"
+
+MONITOR
+30
+450
+142
+495
+Current Round
+current-round-no
+17
+1
+11
+
+MONITOR
+140
+450
+247
+495
+Current Block
+current-block-no
+2
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

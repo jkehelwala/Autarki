@@ -10,6 +10,8 @@ to setup
   setup_peers
   reset-ticks ;; start the clock
   initiate_round
+  set-plot-x-range 0 No-of-Peers
+  set-plot-y-range 0 100
 end
 
 to go
@@ -18,6 +20,18 @@ to go
   output-print(word "Current Block - " current-block)
   ;; py:run "pyagent.log_agent_chains(run_no)"
   ;; ask peers [ output-print(list who transactions) ] ;; TODO
+end
+
+to-report current-round-no
+  report current-round
+end
+
+to-report current-block-no
+  report current-block
+end
+
+to-report overall-block
+  report ( (current-round - 1)* No-of-Peers ) + current-block
 end
 
 to set_constants
@@ -118,7 +132,18 @@ to schedule_block [tail]
     time:schedule-event "observer" [ [] -> initiate_block ] new-time  ;; Start after at least `tail` transactions
 end
 
+to plot-vote-precentage
+  py:set "current_block" block
+  let obtained-votes-no (py:runresult "pyagent.get_no_of_votes(current_block)")
+  let obtained-vote-precentage ( ( obtained-votes-no / No-of-Peers ) * 100 ) 
+  plotxy overall-block obtained-vote-precentage
+end
+
 to initiate_block
+  ask peers with [peer-id = current-block-proposer-id ] [
+    update-plots
+    plot-vote-precentage
+  ]
   set current-block (current-block + 1)
   output-print(word "Round: " current-round " Block: " current-block)
   if current-block > No-of-Peers [
@@ -134,7 +159,6 @@ to initiate_block
   set current-block-proposer-id get_proposer
   py:set "curr_proposer_id" current-block-proposer-id
   py:set "curr_time" ticks
-  output-print(word "start_block " ticks)
   ask peers with [peer-id = current-block-proposer-id ] [
     set block (py:runresult "pyagent.get_new_block(run_no, curr_proposer_id, curr_time)")
     push-peer-block
