@@ -61,13 +61,6 @@ NIL
 NIL
 1
 
-OUTPUT
-545
-270
-1120
-470
-11
-
 SLIDER
 220
 40
@@ -158,7 +151,7 @@ Duration
 Duration
 200
 10000
-200.0
+500.0
 100
 1
 ticks
@@ -244,7 +237,7 @@ Min-Attack-Probability
 Min-Attack-Probability
 0
 1
-0.0
+1.0
 0.01
 1
 NIL

@@ -45,7 +45,7 @@ end
 to go
   time:go-until Duration;; (TODO: substitute ticks with number of rounds when termination is deterministic)
   ;; py:run "pyagent.log_agent_chains(run_no)"
-  ;; ask peers [ output-print(list who transactions) ] ;; TODO
+  ;; ask peers [ console-log(list who transactions) ] ;; TODO
 end
 
 to-report current-round-no
@@ -151,7 +151,7 @@ end
 
 to initiate_block
   ask peers with [peer-id = current-block-proposer-id ] [
-    output-print(word "Finished: Round: " current-round " Block: " current-block " Attack Tolerance: " attack_tolerance_data)
+    console-log(word "Finished: Round: " current-round " Block: " current-block " Attack Tolerance: " attack_tolerance_data)
     update-plots
     plot-vote-precentage
   ]
@@ -160,7 +160,7 @@ to initiate_block
     stop
   ]
   set current-block (current-block + 1)
-  output-print(word "Started: Round: " current-round " Block: " current-block)
+  console-log(word "Started: Round: " current-round " Block: " current-block)
   remove_attacker_influence
   if member? current-block [blocks-to-attack] of battacker [
     ask battacker [
@@ -194,7 +194,7 @@ to receive-block [proposed-block sending-peer recurse]
       receive-block proposed-block sending-peer false ;; Fix for infinite loop
     ]
     [
-      output-print(word "Empty Block" [peer-id] of self) ;; TODO exit here? Priority #2
+      console-log(word "Empty Block" [peer-id] of self) ;; TODO exit here? Priority #2
       stop
     ]
   ]
@@ -243,7 +243,7 @@ to request-blockchain [from_index to_index] ;; turtle-method
   py:set "update_index_from" from_index
   let transfer-success (py:runresult "pyagent.blockchain_request(run_no, p_id, sending_peer, update_index_from, update_index_to)") ;; TODO Change to most available peer if necessary
   if not transfer-success [
-    output-print(word "Blockchain transfer successful :" transfer-success)
+    console-log(word "Blockchain transfer successful :" transfer-success)
   ]
 end
 
@@ -268,7 +268,6 @@ to-report get_proposer
   ]
   py:set "curr_proposer_id" candidate
   py:run "pyagent.complete_proposer_transfer(run_no, prev_proposer_id, curr_proposer_id)"
-  output-print(word "candidate " candidate)
   report candidate
 end
 
