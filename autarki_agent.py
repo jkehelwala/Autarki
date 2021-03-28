@@ -7,8 +7,11 @@ from ledger.Block import Block
 networks = dict()
 
 
-def init_run(run_number):
-    networks[run_number] = Network(run_number)
+def init_run(run_number, run_name, total_peers, required_votes, timeout_in_seconds, learning_strategy,
+             is_cost_heterogeneous, benefit_per_unit_of_cost, minimum_attack_probability, desc_data):
+    networks[run_number] = Network(run_number, run_name, total_peers, required_votes, timeout_in_seconds,
+                                   learning_strategy, is_cost_heterogeneous, benefit_per_unit_of_cost,
+                                   minimum_attack_probability, desc_data)
     logfilename = const_log_file_name + "_R-%d.log" % run_number
     logging.config.fileConfig('conf/log.conf', defaults={'logfilename': logfilename})
 
@@ -17,8 +20,8 @@ def create_peer(run_number, node_id):
     return networks[run_number].create_peer(node_id)
 
 
-def start_round(run_number, round_number, no_blocks_per_round, attack_probability_range):
-    networks[run_number].start_round(round_number, no_blocks_per_round, attack_probability_range)
+def start_round(run_number, round_number):
+    networks[run_number].start_round(round_number)
 
 
 def transaction(run_number, time):
@@ -43,9 +46,9 @@ def get_blocks_to_attack(run_number, curr_round):
     return networks[run_number].get_round(curr_round).get_attacking_rounds()
 
 
-def set_peer_network_variables(run_number, peer_list, votes_required):
+def set_peer_network_variables(run_number, peer_list):
     peer_set = set(peer_list)
-    networks[run_number].set_peer_network_variables(peer_set, (float(votes_required) / 100.00))
+    networks[run_number].set_peer_network_variables(peer_set)
 
 
 def get_proposer(run_number, from_peer=const_none):
@@ -100,10 +103,6 @@ def check_proposed_block_status(run_number, proposer):
     return networks[run_number].get_peer(proposer).check_proposed_block_status()
 
 
-def set_block_timeout(run_number, timeout_in_secs):
-    networks[run_number].set_block_timeout(timeout_in_secs)
-
-
 def if_block_timed_out(run_number):
     return networks[run_number].is_block_timed_out()
 
@@ -114,6 +113,10 @@ def get_no_of_votes(current_block):
     except TypeError:
         votes = 0
     return votes
+
+
+def get_no_of_attackers_tolerable(run_number):
+    return networks[run_number].no_of_attackers_tolerable()
 
 
 if __name__ == '__main__':

@@ -21,7 +21,6 @@ peers-own [
   con-strength 
   allowed-link-no 
   is-down 
-  is-protected
   transactions
   block
   ;; strategies      ;; TODO list of strategies (from elfarol)
@@ -33,18 +32,18 @@ peers-own [
 globals [ 
   bserver 
   battacker 
-  first-contact
   current-round
   current-block
   current-block-proposer-id
-  const-attack-probabilities
-  const-con-strength 
-  const-peers ;; (list min max)
-  ;; 
+  
   ;; Timing related
   new-transaction-generation-time
-  ;; block-timeout block-start-time ;; for ticks (not used atm)
+  ;; block-timeout block-start-time ;; for ticks (Not used atm)
   peer-breathe-time
+  
   ;; Visualization Related
   subdue-color ;;  To make non-neighbour links less visible
+  
+  ;; Transaction Propogation related (Not used atm)
+  first-contact
 ]

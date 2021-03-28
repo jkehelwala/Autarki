@@ -9,8 +9,9 @@ from ledger.Block import Block
 
 
 class Peer:
-    def __init__(self, who_id):
+    def __init__(self, who_id, count_of_votes_required):
         self.who_id = who_id  # Constant NetLogo Id For Reference only
+        self.__votes_required = count_of_votes_required
         self.peer_id = str(uuid.uuid4())
         self.transactions = defaultdict(list)  # TODO
         self.blockchain = list()
@@ -18,7 +19,6 @@ class Peer:
         self.is_protected = False
         self.proposers = list()
         self.__peer_set = set()
-        self.__votes_required = None
         self.picked_proposer_set = set()
         self.current_block = None
         self.current_block_accepted = True
@@ -70,9 +70,8 @@ class Peer:
     def set_protected(self):
         self.is_protected = bool(self.who_id % 3 != 1)  # TODO pick value based on strategy and previous blocks
 
-    def set_network_variables(self, peer_set, votes_ratio, count_of_votes_needed):
+    def set_peer_set(self, peer_set):
         self.__peer_set = peer_set
-        self.__votes_required = count_of_votes_needed
 
     def get_proposer(self):
         selected_proposer = None

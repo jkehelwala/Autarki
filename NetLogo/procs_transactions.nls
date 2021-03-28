@@ -1,5 +1,9 @@
 ;; Actual Scheduling of Transaction Propagation
 
+to setup_gossip_transactions
+  set first-contact round (No-of-Peers / 10) 
+end
+
 to schedule_transaction_propagation
   let cur_time ticks
   time:schedule-repeating-event "observer" [ [] -> init_server_transaction ] cur_time new-transaction-generation-time ;; Initiate a new transaction every "new-transaction-generation-time" ticks 

@@ -3,21 +3,47 @@ to setup
   clear-all
   py:setup py:python
   py:run "import autarki_agent as pyagent"
-  py:set "run_no" behaviorspace-run-number
-  py:run "pyagent.init_run(run_no)"
-  ;; ask patches [ set pcolor white ]
+  set_run
   set_constants
   setup_peers
+  ;; setup_gossip_transactions ;; (NOTE: Used for gossip transaction propogation over direct transmission)
   reset-ticks ;; start the clock
   initiate_round
+  set-plots
+end
+
+to set-plots
   set-plot-x-range 0 No-of-Peers
   set-plot-y-range 0 100
 end
 
+to set_run
+  py:set "run_no" behaviorspace-run-number
+  py:set "run_name" behaviorspace-experiment-name
+  py:set "total_peers" No-of-Peers
+  py:set "required_votes" Votes-Required ;; Percentage Conversion done inside python
+  py:set "timeout_in_seconds" Block-Timeout
+  py:set "learning_strategy" Learning-Methodology
+  py:set "is_cost_heterogeneous" Heterogeneous-Cost
+  py:set "benefit_per_unit_of_cost" Benefit-Per-Unit-Of-Cost
+  py:set "minimum_attack_probability" Min-Attack-Probability
+  py:set "desc_data" (list Duration Min-Con-Strength Max-Con-Strength Min-Peer-Cons Max-Peer-Cons)
+  py:run "pyagent.init_run(run_no, run_name, total_peers, required_votes, timeout_in_seconds, learning_strategy, is_cost_heterogeneous, benefit_per_unit_of_cost, minimum_attack_probability, desc_data)"
+end
+
+to set_constants
+  set-default-shape peers "a_peer"
+  ;; Constant setup
+  set subdue-color 4
+  set current-round 0
+  set current-block-proposer-id ""
+  ;; Timing setup (TODO: Move to UI if necessary)
+  set new-transaction-generation-time 10 ;; TODO Increase if transaction propagation is used
+  set peer-breathe-time 2
+end
+
 to go
-  time:go-until Duration;; (ticks)
-  output-print(word "Current Round - " current-round)
-  output-print(word "Current Block - " current-block)
+  time:go-until Duration;; (TODO: substitute ticks with number of rounds when termination is deterministic)
   ;; py:run "pyagent.log_agent_chains(run_no)"
   ;; ask peers [ output-print(list who transactions) ] ;; TODO
 end
@@ -34,22 +60,9 @@ to-report overall-block
   report ( (current-round - 1)* No-of-Peers ) + current-block
 end
 
-to set_constants
-  set-default-shape peers "a_peer"
-  ;; Constant setup
-  set subdue-color 4
-  set current-round 0
-  set current-block-proposer-id ""
-  ;; Network setup
-  set first-contact round (No-of-Peers / 10) ;; TODO Move to UI
-  set const-con-strength (list 1 10) ;; TODO Move to UI
-  set const-peers (list 2 4)  ;; TODO Move to UI
-  set const-attack-probabilities (list 0.01 1) ;; TODO Move to UI (only Minimum attack probability)
-  ;; Timing setup
-  set new-transaction-generation-time 10 ;; TODO Increase if transaction propagation is used
-  py:set "timeout_in_seconds" Block-Timeout
-  py:run "pyagent.set_block_timeout(run_no, timeout_in_seconds)"
-  set peer-breathe-time 2
+to-report attack_tolerance_data
+  let no-of-attackers-tolerable (py:runresult "pyagent.get_no_of_attackers_tolerable(run_no)")
+  report (word count peers with [is-down] "/" no-of-attackers-tolerable)
 end
 
 to setup_peers
@@ -73,38 +86,37 @@ to setup_peers
     set transactions "{}"
     set block "{}"
     set is-down False
-    set con-strength first const-con-strength +  random (last const-con-strength - first const-con-strength)
-    set allowed-link-no first const-peers + random (last const-peers - first const-peers) 
-    py:set "x" who ;; TONOTE: This is for record keeping/signature. Peers will not be addressed through this. 
+    set con-strength Min-Con-Strength +  random (Max-Con-Strength - Min-Con-Strength)
+    set allowed-link-no Min-Peer-Cons + random (Max-Peer-Cons - Min-Peer-Cons)
+    py:set "x" who ;; TONOTE: This is for record keeping/signature. Peers will not be addressed through this.
     set peer-id (py:runresult "pyagent.create_peer(run_no, x)")
   ]
-  ask bserver [ 
-    create-server-cons-to other peers [ 
-      set color blue - subdue-color  
-      set delay [con-strength] of other-end 
+  ask bserver [
+    create-server-cons-to other peers [
+      set color blue - subdue-color
+      set delay [con-strength] of other-end
     ]
     ;; ask my-out-server-cons []
   ]
-  ask battacker [ 
-    create-attacker-cons-to other peers [ 
+  ask battacker [
+    create-attacker-cons-to other peers [
       set delay [con-strength] of other-end
       set color orange - subdue-color
     ]
   ]
   ask peers [
     let available-links [allowed-link-no] of self - (count my-peer-cons ) ;; leftover links than the default server/attacker connections
-    if available-links > 0 [ 
+    if available-links > 0 [
       create-peer-cons-with n-of available-links other peers
     ]
     ask peer-cons [
       set color turquoise
       set delay min(list [con-strength] of end1 [con-strength] of end2)
       ;; set thickness delay /(last const-con-strength * 10) ;; TODO: Uncomment for visual confirmation
-    ]   
+    ]
   ]
   py:set "peers_list" [peer-id] of peers
-  py:set "required_votes" Votes-Required ;; Percentage Conversion done inside python
-  py:run "pyagent.set_peer_network_variables(run_no, peers_list, required_votes)"
+  py:run "pyagent.set_peer_network_variables(run_no, peers_list)"
 end
 
 to initiate_round
@@ -112,12 +124,10 @@ to initiate_round
   py:set "current_round" current-round
   set current-block 0
   remove_attacker_influence
-  py:set "attack_probability_range" const-attack-probabilities
-  py:set "blocks_to_be_proposed" No-of-Peers
-  py:run "pyagent.start_round(run_no, current_round, blocks_to_be_proposed, attack_probability_range)"
+  py:run "pyagent.start_round(run_no, current_round)"
   ask battacker [ set blocks-to-attack (py:runresult "pyagent.get_blocks_to_attack(run_no, current_round)")  ]
   ;; TODO bring forward remaining transactions if any (Check Readme)
-  reschedule_events 10 ;; Start after at least 10 transactions 
+  reschedule_events 10 ;; Start after at least 10 transactions
 end
 
 to reschedule_events [block_count]
@@ -135,21 +145,22 @@ end
 to plot-vote-precentage
   py:set "current_block" block
   let obtained-votes-no (py:runresult "pyagent.get_no_of_votes(current_block)")
-  let obtained-vote-precentage ( ( obtained-votes-no / No-of-Peers ) * 100 ) 
+  let obtained-vote-precentage ( ( obtained-votes-no / No-of-Peers ) * 100 )
   plotxy overall-block obtained-vote-precentage
 end
 
 to initiate_block
   ask peers with [peer-id = current-block-proposer-id ] [
+    output-print(word "Finished: Round: " current-round " Block: " current-block " Attack Tolerance: " attack_tolerance_data)
     update-plots
     plot-vote-precentage
   ]
-  set current-block (current-block + 1)
-  output-print(word "Round: " current-round " Block: " current-block)
-  if current-block > No-of-Peers [
+  if (current-block + 1) > No-of-Peers [
     initiate_round
     stop
   ]
+  set current-block (current-block + 1)
+  output-print(word "Started: Round: " current-round " Block: " current-block)
   remove_attacker_influence
   if member? current-block [blocks-to-attack] of battacker [
     ask battacker [
@@ -165,7 +176,7 @@ to initiate_block
   ]
 end
 
-to receive-block [proposed-block sending-peer]
+to receive-block [proposed-block sending-peer recurse]
   if is-down [stop]
   let is-block-timeout (py:runresult "pyagent.if_block_timed_out(run_no)")
   if is-block-timeout [
@@ -178,12 +189,12 @@ to receive-block [proposed-block sending-peer]
   let was-processed first temp-returned
   let process-returns last temp-returned
   if not was-processed [
-    ifelse process-returns != "" [
+    ifelse process-returns != "" and recurse [
       request-blockchain first process-returns last process-returns
-      ;; receive-block proposed-block sending-peer ;; TODO Fix possible infinite loop and index out of range issue
+      receive-block proposed-block sending-peer false ;; Fix for infinite loop
     ]
     [
-      output-print(word "Empty Block" [peer-id] of self) ;; TODO exit here? Priority #2 
+      output-print(word "Empty Block" [peer-id] of self) ;; TODO exit here? Priority #2
       stop
     ]
   ]
@@ -196,27 +207,33 @@ to receive-block [proposed-block sending-peer]
       py:run "pyagent.notify_proposer(run_no, curr_proposer_id, p_id)" ;; For termination purposes. This could be done via python itself but we add here for realistic purposes
       time:schedule-event self [ [] -> push-peer-block ] (tmp_ticks + con-strength) ;; TODO This is problematic
     ]
-    if was-accepted [
-      ;; NOTE: For simulation (early) block termination purposes
-      ifelse (current-block-proposer-id = peer-id) [
-        let block_in_chain (py:runresult "pyagent.check_proposed_block_status(run_no, curr_proposer_id)")
-        if block_in_chain [
-          reschedule_events 5
-        ]
-      ]
-      [
-        py:run "pyagent.notify_proposer(run_no, curr_proposer_id, p_id)"
-      ]
+    if was-accepted and recurse [ ;; fix for infinite loop
+      push-peer-block-to-all
     ]
   ]
 end
+
 
 to push-peer-block ;; turtle-method
   if block != "{}" and not is-down  [
     py:set "proposed_block" block
     py:set "sending_peer" [peer-id] of self ;; For request-blockchain method
     ask out-peer-con-neighbors [
-      receive-block block [peer-id] of self
+      receive-block block ([peer-id] of self) true
+    ]
+  ]
+end
+
+to push-peer-block-to-all ;; turtle-method
+  py:set "proposed_block" block
+  py:set "sending_peer" [peer-id] of self ;; For request-blockchain method
+  ask peers [
+    receive-block block ([peer-id] of self) false
+  ]
+  ask peers with [peer-id = current-block-proposer-id ] [
+    let block_in_chain (py:runresult "pyagent.check_proposed_block_status(run_no, curr_proposer_id)")
+    if block_in_chain [
+      reschedule_events 5
     ]
   ]
 end
@@ -232,8 +249,8 @@ end
 
 to remove_attacker_influence
   ask peers [
-    if not is-down [ stop ] 
-    py:set "p_id" [peer-id] of self 
+    if not is-down [ stop ]
+    py:set "p_id" [peer-id] of self
     py:run "pyagent.remove_attacker_influence(run_no, p_id)"
     set is-down False
     set shape "a_peer"
@@ -252,16 +269,13 @@ to-report get_proposer
   py:set "curr_proposer_id" candidate
   py:run "pyagent.complete_proposer_transfer(run_no, prev_proposer_id, curr_proposer_id)"
   output-print(word "candidate " candidate)
-  report candidate  
+  report candidate
 end
 
 to attack_agent
-  py:set "p_id" [peer-id] of self 
+  py:set "p_id" [peer-id] of self
   set is-down (py:runresult "pyagent.attack_agent(run_no, p_id)")
   if not is-down [ stop ]
   set shape "a_victim"
   ;; ask my-peer-cons [ set color red ] ;; TONOTE: Not necessary since incoming would still work (and be wasted cuz agent is down)
 end
-
-
-
