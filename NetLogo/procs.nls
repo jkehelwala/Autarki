@@ -8,12 +8,11 @@ to setup
   setup_peers
   ;; setup_gossip_transactions ;; (NOTE: Used for gossip transaction propogation over direct transmission)
   reset-ticks ;; start the clock
-  initiate_round
   set-plots
 end
 
 to set-plots
-  set-plot-x-range 0 No-of-Peers
+  set-plot-x-range 1 No-of-Peers
   set-plot-y-range 0 100
 end
 
@@ -43,6 +42,7 @@ to set_constants
 end
 
 to go
+  initiate_round
   time:go-until Duration;; (TODO: substitute ticks with number of rounds when termination is deterministic)
   ;; py:run "pyagent.log_agent_chains(run_no)"
   ;; ask peers [ console-log(list who transactions) ] ;; TODO
@@ -194,7 +194,7 @@ to receive-block [proposed-block sending-peer recurse]
       receive-block proposed-block sending-peer false ;; Fix for infinite loop
     ]
     [
-      console-log(word "Empty Block" [peer-id] of self) ;; TODO exit here? Priority #2
+      console-log(word "Empty Block " [peer-id] of self) ;; TODO exit here? Priority #2
       stop
     ]
   ]
@@ -204,7 +204,7 @@ to receive-block [proposed-block sending-peer recurse]
     py:set "curr_proposer_id" current-block-proposer-id
     if temp-block != "" [
       set block temp-block
-      py:run "pyagent.notify_proposer(run_no, curr_proposer_id, p_id)" ;; For termination purposes. This could be done via python itself but we add here for realistic purposes
+      ;; py:run "pyagent.notify_proposer(run_no, curr_proposer_id, p_id)" ;; For termination purposes. This could be done via python itself but we add here for realistic purposes
       time:schedule-event self [ [] -> push-peer-block ] (tmp_ticks + con-strength) ;; TODO This is problematic
     ]
     if was-accepted and recurse [ ;; fix for infinite loop
@@ -217,7 +217,7 @@ end
 to push-peer-block ;; turtle-method
   if block != "{}" and not is-down  [
     py:set "proposed_block" block
-    py:set "sending_peer" [peer-id] of self ;; For request-blockchain method
+    py:set "sending_peer" current-block-proposer-id ;; [peer-id] of self ;; For request-blockchain method
     ask out-peer-con-neighbors [
       receive-block block ([peer-id] of self) true
     ]
@@ -233,7 +233,7 @@ to push-peer-block-to-all ;; turtle-method
   ask peers with [peer-id = current-block-proposer-id ] [
     let block_in_chain (py:runresult "pyagent.check_proposed_block_status(run_no, curr_proposer_id)")
     if block_in_chain [
-      reschedule_events 5
+      ;; reschedule_events 5
     ]
   ]
 end

@@ -17,6 +17,9 @@ class Block:
         self.votes.add(self.proposer)
         self.signature = self.get_signature(self.proposer)
 
+    def get_index(self):
+        return self.index
+
     def get_signature(self, proposer):
         signature = str(self.index) + str(self.transactions) + str(self.timestamp) + str(self.previous_hash)
         h = hmac.new(str.encode(proposer), str.encode(signature), hashlib.sha256)
@@ -79,4 +82,10 @@ class Block:
         verified = self.previous_hash == prev_hash
         if verified:
             verified = self.transactions.items() <= voter_transactions.items()  # Check if subset
-        return verified, self.index
+        return verified
+
+    def has_voted(self, peer_id):
+        return peer_id in self.votes
+
+    def get_votes(self):
+        return self.votes

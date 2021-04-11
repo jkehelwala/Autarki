@@ -14,6 +14,7 @@ def init_run(run_number, run_name, total_peers, required_votes, timeout_in_secon
                                    minimum_attack_probability, desc_data)
     logfilename = const_log_file_name + "_R-%d.log" % run_number
     logging.config.fileConfig('conf/log.conf', defaults={'logfilename': logfilename})
+    logging.debug("======================== %s ============================", logfilename)
 
 
 def create_peer(run_number, node_id):

@@ -5,11 +5,13 @@ import uuid
 from collections import defaultdict
 
 from context.Constants import const_none
+from learning import LearningMethodologyFactory
 from ledger.Block import Block
 
 
 class Peer:
-    def __init__(self, who_id, count_of_votes_required):
+    def __init__(self, who_id, total_peers, count_of_votes_required, benefit_per_unit_of_cost, cost, learning_strategy,
+                 tolerance):
         self.who_id = who_id  # Constant NetLogo Id For Reference only
         self.__votes_required = count_of_votes_required
         self.peer_id = str(uuid.uuid4())
@@ -20,13 +22,20 @@ class Peer:
         self.proposers = list()
         self.__peer_set = set()
         self.picked_proposer_set = set()
-        self.current_block = None
+        self.current_block = Block(-1, {}, "", "", "-1")
         self.current_block_accepted = True
         self.previous_block_signature = "-1"  # TODO Note genesis block
         self.state = None  # TODO
-        self.strategy = None  # TODO
+        self.learning_choice = learning_strategy
+        self.chosen_strategy = None
         self.proposed_accepted_list = list()  # Only used when self is the proposer. Simulation termination purposes
         self.proposer_accepted = False
+        self.prev_round_chain_length = 0
+        # For calculations
+        self.total_peers = total_peers
+        self.__cost = cost
+        self.benefit = benefit_per_unit_of_cost * self.__cost
+        self.tolerance = tolerance
 
     def log_chain(self):
         logging.debug("Peer.print_chain: Begin %s, %s", self.who_id, self.peer_id)
@@ -34,10 +43,13 @@ class Peer:
             block_item.log_block_string()
         logging.debug("Peer.print_chain: End %s, %s", self.who_id, self.peer_id)
 
-    def start_round(self):
+    def start_round(self, round_no):
         self.is_under_attack = False
         self.is_protected = False
+        self.chosen_strategy = None
         self.set_protected()
+        self.prev_round_chain_length = len(self.blockchain)
+        logging.debug("Peer.start_round: %s", self.is_protected)
         self.proposers.clear()
 
     def set_transactions(self, transactions_json):
@@ -68,7 +80,16 @@ class Peer:
         self.is_under_attack = False
 
     def set_protected(self):
-        self.is_protected = bool(self.who_id % 3 != 1)  # TODO pick value based on strategy and previous blocks
+        if self.get_blocks_in_round() is None:
+            self.is_protected = bool(self.who_id % 2 != 0)  # TODO: Default
+            return
+        self.chosen_strategy = LearningMethodologyFactory.get_learning_methodology(self.learning_choice, self)
+        self.is_protected = self.chosen_strategy.is_investing_in_security()
+
+    def get_blocks_in_round(self):
+        if self.prev_round_chain_length <= 0:
+            return None
+        return self.blockchain[self.prev_round_chain_length:]
 
     def set_peer_set(self, peer_set):
         self.__peer_set = peer_set
@@ -114,31 +135,50 @@ class Peer:
         # logging.debug("Peer.accept_block")
         if self.current_block.vote_count() < self.__votes_required:
             return False
-        logging.debug("Peer.accept_block : Enough votes received. Accepting Block. Votes: %d/%d, By: %s",
+        self.accept_block_to_chain()  # TODO
+        self.current_block_accepted = True
+        return True
+
+    def accept_block_to_chain(self):
+        logging.debug("Peer.accept_block_to_chain : Accepting Block. Votes: %d/%d, By: %s",
                       self.current_block.vote_count(), self.__votes_required, self.who_id)
         self.blockchain.append(self.current_block)
         self.previous_block_signature = self.current_block.block_signature()
         self.purge_committed_transactions()
-        self.current_block_accepted = True
-        return True
 
     def update_current_block(self, block_json):
         verified_votes = False
         if self.current_block_accepted:
             eval_block = Block.from_json(block_json)
-            verified, index = eval_block.verify(self.previous_block_signature, self.transactions)
-            if verified:
+            if self.update_votes_on_accepted_block(block_json, eval_block):
+                return True, 0
+            verified = eval_block.verify(self.previous_block_signature, self.transactions)
+            if verified and self.current_block.get_index() < eval_block.get_index():
                 self.current_block = eval_block
                 self.current_block_accepted = False
-            if len(self.blockchain) < index:
-                logging.info("Peer.update_current_block: Needs to obtain blockchain")
-                return False, [len(self.blockchain), index - 1]  # TODO request blockchain from neighbors
+                if len(self.blockchain) < self.current_block.get_index():
+                    logging.info("Peer.update_current_block: Needs to obtain blockchain")
+                    return False, [len(self.blockchain), self.current_block.get_index() - 1]  # TODO request blockchain
         if not self.current_block_accepted:
             verified_votes = self.current_block.update_votes(block_json, self.__peer_set)
         if verified_votes:
             self.current_block.vote(self.peer_id)
             self.accept_block()  # TODO voting in order for reputation collection, UniqueList?
         return True, 0
+
+    def update_votes_on_accepted_block(self, block_json, eval_block):
+        if not self.current_block.block_signature() == eval_block.block_signature():
+            return False
+        if not eval_block.vote_count() > self.current_block.vote_count():
+            return False
+        final_index = len(self.blockchain) - 1
+        if final_index < 0:
+            return False
+        self.blockchain[final_index].update_votes(block_json, self.__peer_set)
+        self.current_block.update_votes(block_json, self.__peer_set)
+        logging.debug("Peer.update_votes_on_accepted_block: Vote Count: %d, By: %d", self.current_block.vote_count(),
+                      self.who_id)
+        return True
 
     def get_current_block_json(self):
         json_output = ""
@@ -175,6 +215,6 @@ class Peer:
 
     def check_proposed_block_status(self):
         if not self.proposer_accepted:
-            self.proposer_accepted = len(self.proposed_accepted_list) >= self.__votes_required
+            self.proposer_accepted = self.current_block.vote_count() >= self.__votes_required
             logging.debug("Peer.check_proposed_block_status: %s", self.proposer_accepted)
         return self.proposer_accepted

@@ -14,3 +14,8 @@ class BlockConst:
     votes = "votes"
     proposer = "proposer"
 
+
+class LearningTypes:
+    reputation_maximization = "Reputation Maximization"
+    regret_matching = "Regret Matching"
+    bounded_rationality = "Bounded Rationality"
