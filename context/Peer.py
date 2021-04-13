@@ -14,7 +14,7 @@ class Peer:
                  tolerance):
         self.who_id = who_id  # Constant NetLogo Id For Reference only
         self.__votes_required = count_of_votes_required
-        self.peer_id = str(uuid.uuid4())
+        self.node_id = str(uuid.uuid4())
         self.transactions = defaultdict(list)  # TODO
         self.blockchain = list()
         self.is_under_attack = False
@@ -38,10 +38,10 @@ class Peer:
         self.tolerance = tolerance
 
     def log_chain(self):
-        logging.debug("Peer.print_chain: Begin %s, %s", self.who_id, self.peer_id)
+        logging.debug("Peer.print_chain: Begin %s, %s", self.who_id, self.node_id)
         for block_item in self.blockchain:
             block_item.log_block_string()
-        logging.debug("Peer.print_chain: End %s, %s", self.who_id, self.peer_id)
+        logging.debug("Peer.print_chain: End %s, %s", self.who_id, self.node_id)
 
     def start_round(self, round_no):
         self.is_under_attack = False
@@ -62,7 +62,7 @@ class Peer:
         return str(json.dumps(self.transactions))
 
     def get_id(self):
-        return self.peer_id
+        return self.node_id
 
     def purge_committed_transactions(self):
         # TODO Why transactions are empty?
@@ -119,7 +119,7 @@ class Peer:
 
     def accept_proposer_position(self):
         self.proposed_accepted_list.clear()
-        self.picked_proposer_set.add(self.peer_id)
+        self.picked_proposer_set.add(self.node_id)
 
     def propose_block(self, ticks):
         if len(self.transactions) == 0:
@@ -128,7 +128,7 @@ class Peer:
         # TODO add transactions some other way with regard to their timing order
         new_block_index = len(self.blockchain)
         block = Block(new_block_index, block_transactions, ticks,
-                      self.previous_block_signature, self.peer_id)
+                      self.previous_block_signature, self.node_id)
         logging.debug("Peer.propose_block: %s", block.get_json())
         return block.get_json()
 
@@ -163,7 +163,7 @@ class Peer:
         if not self.current_block_accepted:
             verified_votes = self.current_block.update_votes(block_json, self.__peer_set)
         if verified_votes:
-            self.current_block.vote(self.peer_id)
+            self.current_block.vote(self.node_id)
             self.accept_block()  # TODO voting in order for reputation collection, UniqueList?
         return True, 0
 
@@ -192,7 +192,7 @@ class Peer:
 
     def get_blockchain_slice(self, index_from, index_to):
         logging.debug("Peer.get_blockchain_slice: Sending blocks from %d to %d from %s", index_from, index_to,
-                      self.peer_id)
+                      self.node_id)
         if self.blockchain[index_from].index == index_from and self.blockchain[index_to].index == index_to:
             logging.debug("Peer.get_blockchain_slice: Slice Accurate")
         else:
@@ -208,7 +208,7 @@ class Peer:
             logging.debug("Exception: Index out of range err. Blockchain Index: %d", len(self.blockchain) - 1)
             index_to = 0
         logging.debug("Peer.set_blockchain_slice: Added blocks from %d to %d from %s", index_from,
-                      index_to, self.peer_id)
+                      index_to, self.node_id)
         return len(self.blockchain) - 1
 
     def collect_added_vote(self, added_by_peer):

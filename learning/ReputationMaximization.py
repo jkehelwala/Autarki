@@ -29,7 +29,7 @@ class ReputationMaximization(PeerLearningMethodology):
         blocks_in_round = self.peer.get_blocks_in_round()
         if blocks_in_round is None:
             return
-        counted_votes = sum(1 if block.has_voted(self.peer.peer_id) else 0 for block in blocks_in_round)
+        counted_votes = sum(1 if block.has_voted(self.peer.node_id) else 0 for block in blocks_in_round)
         self.r_current = counted_votes / self.peer.total_peers
         self.prev_f = len(blocks_in_round) / self.peer.total_peers
         fbr = self.prev_f * self.peer.benefit * self.r_current
