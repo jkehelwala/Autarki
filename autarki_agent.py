@@ -7,10 +7,10 @@ from ledger.Block import Block
 networks = dict()
 
 
-def init_run(run_number, run_name, total_peers, required_votes, timeout_in_seconds, learning_strategy,
+def init_run(run_number, run_name, total_peers, required_votes, learning_strategy,
              is_cost_heterogeneous, benefit_per_unit_of_cost, minimum_attack_probability, desc_data):
-    networks[run_number] = Network(run_number, run_name, total_peers, required_votes, timeout_in_seconds,
-                                   learning_strategy, is_cost_heterogeneous, benefit_per_unit_of_cost,
+    networks[run_number] = Network(run_number, run_name, total_peers, required_votes, learning_strategy,
+                                   is_cost_heterogeneous, benefit_per_unit_of_cost,
                                    minimum_attack_probability, desc_data)
     logfilename = const_log_file_name + "_R-%d.log" % run_number
     logging.config.fileConfig('conf/log.conf', defaults={'logfilename': logfilename})
@@ -69,7 +69,6 @@ def complete_proposer_transfer(run_number, from_peer, to_peer):
 
 # Block Proposal
 def get_new_block(run_number, proposer_id, time_in_ticks):
-    networks[run_number].set_curr_block_timeout()
     return networks[run_number].get_peer(proposer_id).propose_block(int(time_in_ticks))
 
 
@@ -102,10 +101,6 @@ def notify_proposer(run_number, proposer, added_by_peer):
 
 def check_proposed_block_status(run_number, proposer):
     return networks[run_number].get_peer(proposer).check_proposed_block_status()
-
-
-def if_block_timed_out(run_number):
-    return networks[run_number].is_block_timed_out()
 
 
 def get_no_of_votes(current_block):

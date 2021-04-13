@@ -124,9 +124,10 @@ class Peer:
     def propose_block(self, ticks):
         if len(self.transactions) == 0:
             return const_none
+        block_transactions = self.transactions
         # TODO add transactions some other way with regard to their timing order
         new_block_index = len(self.blockchain)
-        block = Block(new_block_index, self.transactions, ticks,
+        block = Block(new_block_index, block_transactions, ticks,
                       self.previous_block_signature, self.peer_id)
         logging.debug("Peer.propose_block: %s", block.get_json())
         return block.get_json()

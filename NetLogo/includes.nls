@@ -34,6 +34,7 @@ globals [
   battacker 
   current-round
   current-block
+  current-block-start-time
   current-block-proposer-id
   
   ;; Timing related

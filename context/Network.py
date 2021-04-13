@@ -19,7 +19,7 @@ def get_peer_costs(total_peers):
 
 
 class Network:
-    def __init__(self, run_id, run_name, total_peers, required_votes, timeout_in_seconds, learning_strategy,
+    def __init__(self, run_id, run_name, total_peers, required_votes, learning_strategy,
                  is_cost_heterogeneous, benefit_per_unit_of_cost, minimum_attack_probability, desc_data):
         # Static Constants
         self.total_peers = total_peers  # total_peers
@@ -40,12 +40,10 @@ class Network:
         # Setting environment constants
         self.run = run_id
         self.run_name = run_name
-        self.block_timeout = timeout_in_seconds
         # End of setting environment constants
         self.transactions = dict()
         self.peers = dict()
         self.rounds = dict()
-        self.curr_block_timeout = None
         self.experiment_descriptive_data = desc_data
 
     def no_of_attackers_tolerable(self):
@@ -89,9 +87,3 @@ class Network:
         logging.debug("Network.get_proposer: %s", proposer)
         return proposer
 
-    def set_curr_block_timeout(self):
-        logging.debug("Network.set_curr_block_timeout")
-        self.curr_block_timeout = time.time() + self.block_timeout
-
-    def is_block_timed_out(self):
-        return time.time() > self.curr_block_timeout

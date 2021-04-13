@@ -139,7 +139,7 @@ Block-Timeout
 45.0
 5
 1
-seconds
+ticks
 HORIZONTAL
 
 SLIDER
