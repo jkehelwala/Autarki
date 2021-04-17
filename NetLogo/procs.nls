@@ -3,20 +3,20 @@ to setup
   clear-all
   py:setup py:python
   py:run "import autarki_agent as pyagent"
-  set_run
-  set_constants
-  setup_peers
+  set-run
+  set-constants
+  setup-peers
   ;; setup_gossip_transactions ;; (NOTE: Used for gossip transaction propogation over direct transmission)
   reset-ticks ;; start the clock
   set-plots
 end
 
 to set-plots
-  set-plot-x-range 1 No-of-Peers
+  set-plot-x-range -1 No-of-Peers
   set-plot-y-range 0 100
 end
 
-to set_run
+to set-run
   py:set "run_no" behaviorspace-run-number
   py:set "run_name" behaviorspace-experiment-name
   py:set "total_peers" No-of-Peers
@@ -26,23 +26,23 @@ to set_run
   py:set "is_cost_heterogeneous" Heterogeneous-Cost
   py:set "benefit_per_unit_of_cost" Benefit-Per-Unit-Of-Cost
   py:set "minimum_attack_probability" Min-Attack-Probability
-  py:set "desc_data" (list Duration Min-Con-Strength Max-Con-Strength Min-Peer-Cons Max-Peer-Cons)
+  py:set "desc_data" "" ;; Misc Data
   py:run "pyagent.init_run(run_no, run_name, total_peers, required_votes, learning_strategy, is_cost_heterogeneous, benefit_per_unit_of_cost, minimum_attack_probability, desc_data)"
 end
 
-to set_constants
+to set-constants
   set-default-shape peers "a_peer"
   ;; Constant setup
-  set subdue-color 4
+  set subdue-color 2
   set current-round 0
-  set current-block-proposer-id ""
   ;; Timing setup (TODO: Move to UI if necessary)
   set new-transaction-generation-time 10 ;; TODO Increase if transaction propagation is used
   set peer-breathe-time 2
 end
 
 to go
-  initiate_round
+  schedule_transaction_propagation_temp ;; TODO change for realistic simulation
+  initiate-round
   time:go-until Duration;; (TODO: substitute ticks with number of rounds when termination is deterministic)
   ;; py:run "pyagent.log_agent_chains(run_no)"
   ;; ask peers [ console-log(list who transactions) ] ;; TODO
@@ -65,7 +65,7 @@ to-report attack_tolerance_data
   report (word count peers with [is-down] "/" no-of-attackers-tolerable)
 end
 
-to setup_peers
+to setup-peers
   ;; Creating Servers
   create-servers 1 [
     set color blue
@@ -84,171 +84,143 @@ to setup_peers
     ;; set color turquoise
     setxy random-pxcor random-pycor
     set transactions "{}"
-    set block "{}"
     set is-down False
-    set con-strength Min-Con-Strength +  random (Max-Con-Strength - Min-Con-Strength)
-    set allowed-link-no Min-Peer-Cons + random (Max-Peer-Cons - Min-Peer-Cons)
+    ;; set-up-peer-link-data (Refer retired.nls)
     py:set "x" who ;; TONOTE: This is for record keeping/signature. Peers will not be addressed through this.
     set peer-id (py:runresult "pyagent.create_peer(run_no, x)")
   ]
   ask bserver [
-    create-server-cons-to other peers [
+    ;; show max-one-of peers [distance myself]
+    create-server-cons-with other peers [
       set color blue - subdue-color
-      set delay [con-strength] of other-end
+      ;; set delay [con-strength] of other-end
     ]
     ;; ask my-out-server-cons []
   ]
   ask battacker [
     create-attacker-cons-to other peers [
-      set delay [con-strength] of other-end
+      ;; set delay [con-strength] of other-end
       set color orange - subdue-color
     ]
   ]
-  ask peers [
-    let available-links [allowed-link-no] of self - (count my-peer-cons ) ;; leftover links than the default server/attacker connections
-    if available-links > 0 [
-      create-peer-cons-with n-of available-links other peers
-    ]
-    ask peer-cons [
-      set color turquoise
-      set delay min(list [con-strength] of end1 [con-strength] of end2)
-      ;; set thickness delay /(last const-con-strength * 10) ;; TODO: Uncomment for visual confirmation
-    ]
-  ]
+  ask peers [ set delay-from-server ceiling(distance bserver) ]
+  verify-timeout
+  ;; set-up-peer-links (Refer retired.nls)
   py:set "peers_list" [peer-id] of peers
   py:run "pyagent.set_peer_network_variables(run_no, peers_list)"
 end
 
-to initiate_round
+to verify-timeout
+  ask max-one-of peers [delay-from-server] [
+    let min-timeout-requirement (2 * [delay-from-server] of self) 
+    if min-timeout-requirement > Block-Timeout [
+      console-log(word "WARNING: Timeout insufficient. Minimum " min-timeout-requirement " required")
+      ;; set Block-Timeout min-timeout-requirement
+      ;; console-log(word "WARNING: Timeout updated to " min-timeout-requirement)
+    ]
+  ]
+end
+
+to initiate-round
   set current-round (current-round + 1)
   py:set "current_round" current-round
   set current-block 0
-  remove_attacker_influence
+  remove-attacker-influence
+  ask peers [carefully [ poll-for-missing-transactions-and-blocks ][console-log("ERROR")] ]
   py:run "pyagent.start_round(run_no, current_round)"
   ask battacker [ set blocks-to-attack (py:runresult "pyagent.get_blocks_to_attack(run_no, current_round)")  ]
-  ;; TODO bring forward remaining transactions if any (Check Readme)
-  reschedule_events 10 ;; Start after at least 10 transactions
+  schedule-block 10 ;; Start after at least 10 transactions
 end
 
-to reschedule_events [block_count]
-  time:clear-schedule
-  schedule_transaction_propagation_temp ;; TODO change for realistic simulation
-  schedule_block block_count ;; Start after at least 10 transactions
-  ;; ask peers [ time:schedule-repeating-event self [ [] -> push-peer-block ] ticks (con-strength) ] ;; TODO (Not suitable)
-end
-
-to schedule_block [tail]
+to schedule-block [tail] ;; Schedule block after at least tail transactions
     let new-time (ticks + (new-transaction-generation-time * tail))
-    time:schedule-event "observer" [ [] -> initiate_block ] new-time  ;; Start after at least `tail` transactions
+    time:schedule-event "observer" [ [] -> initiate-block ] new-time  ;; Start after at least `tail` transactions
 end
 
 to plot-vote-precentage
-  py:set "current_block" block
-  let obtained-votes-no (py:runresult "pyagent.get_no_of_votes(current_block)")
+  let obtained-votes-no (py:runresult "pyagent.get_no_of_votes(run_no)")
   let obtained-vote-precentage ( ( obtained-votes-no / No-of-Peers ) * 100 )
   plotxy overall-block obtained-vote-precentage
 end
 
-to initiate_block
-  ask peers with [peer-id = current-block-proposer-id ] [
+to initiate-block
+  ask bserver [
     console-log(word "Finished: Round: " current-round " Block: " current-block " Attack Tolerance: " attack_tolerance_data)
     update-plots
     plot-vote-precentage
   ]
   if (current-block + 1) > No-of-Peers [
-    initiate_round
+    initiate-round
     stop
   ]
   set current-block (current-block + 1)
   console-log(word "Started: Round: " current-round " Block: " current-block)
-  remove_attacker_influence
+  remove-attacker-influence
   if member? current-block [blocks-to-attack] of battacker [
     ask battacker [
-      ask attacker-con-neighbors [ attack_agent ]
+      ask attacker-con-neighbors [ attack-agent ]
     ]
   ]
-  set current-block-proposer-id get_proposer
-  py:set "curr_proposer_id" current-block-proposer-id
-  py:set "curr_time" ticks
-  py:set current-block-start-time ticks
-  ask peers with [peer-id = current-block-proposer-id ] [
-    set block (py:runresult "pyagent.get_new_block(run_no, curr_proposer_id, curr_time)")
-    push-peer-block
-  ]
-end
-
-to receive-block [proposed-block sending-peer recurse]
-  if is-down [stop]
-  let tmp_ticks ticks
-  let is-block-timeout (tmp_ticks  > (current-block-start-time + Block-Timeout) ) 
-  if is-block-timeout [
-    reschedule_events 5
-    stop
-  ]  
-  py:set "p_id" [peer-id] of self
-  let temp-returned (py:runresult "pyagent.propagate_block_to_peer(run_no, p_id, proposed_block)")
-  let was-processed first temp-returned
-  let process-returns last temp-returned
-  if not was-processed [
-    ifelse process-returns != "" and recurse [
-      request-blockchain first process-returns last process-returns
-      receive-block proposed-block sending-peer false ;; Fix for infinite loop
-    ]
-    [
-      console-log(word "Empty Block " [peer-id] of self) ;; TODO exit here? Priority #2
+  ask peers [carefully [ poll-for-missing-transactions-and-blocks ][console-log("ERROR")] ]
+  console-log("Polling completed")
+  let current-block-start-time ticks
+  py:set "curr_time" current-block-start-time
+  ask bserver [
+    set server-block (py:runresult "pyagent.get_new_block(run_no, curr_time)")
+    console-log(server-block)
+    if server-block = "{}" or server-block = "" [
+      console-log(word "Empty Block: Round: " current-round " Block: " current-block)
+      schedule-block 20
       stop
     ]
-  ]
-  if was-processed [
-    let was-accepted first process-returns
-    let temp-block last process-returns
-    py:set "curr_proposer_id" current-block-proposer-id
-    if temp-block != "" [
-      set block temp-block
-      ;; py:run "pyagent.notify_proposer(run_no, curr_proposer_id, p_id)" ;; For termination purposes. This could be done via python itself but we add here for realistic purposes
-      time:schedule-event self [ [] -> push-peer-block ] (tmp_ticks + con-strength) ;; TODO This is problematic
+    let timeout-point (current-block-start-time + Block-Timeout)
+    ask out-server-con-neighbors [
+      if not is-down [
+        time:schedule-event self [ [] -> vote-for-block timeout-point ] (current-block-start-time + (delay-from-server))
+      ]
     ]
-    if was-accepted and recurse [ ;; fix for infinite loop
-      push-peer-block-to-all
-    ]
+    time:schedule-event self [ [] -> evaluate-votes ] timeout-point
   ]
 end
 
+to vote-for-block [timeout]
+  if is-down [stop]  ;; TODO map path back to server and vote only if necessary
+  if ticks  >= timeout [ stop ]
+  py:set "proposed_block" server-block
+  py:set "voting_peer" [peer-id] of self
+  let verify (py:runresult "pyagent.authenticate_and_vote(run_no, voting_peer, proposed_block)")
+  if verify [
+    py:run "pyagent.notify_server(run_no, voting_peer)"
+  ]
+end
 
-to push-peer-block ;; turtle-method
-  if block != "{}" and not is-down  [
-    py:set "proposed_block" block
-    py:set "sending_peer" current-block-proposer-id ;; [peer-id] of self ;; For request-blockchain method
-    ask out-peer-con-neighbors [
-      receive-block block ([peer-id] of self) true
+to evaluate-votes
+  let block-voted-in (py:runresult "pyagent.check_block_status(run_no)")
+  if block-voted-in [
+    let updated-block (py:runresult "pyagent.get_voted_block_json(run_no)")
+    let tmp-ticks ticks
+    ask out-server-con-neighbors [
+      if not is-down [
+        time:schedule-event self [ [] -> push-voted-block-to-peer updated-block ] (tmp-ticks + (delay-from-server)) 
+      ]
     ]
   ]
+  schedule-block 20
 end
 
-to push-peer-block-to-all ;; turtle-method
-  py:set "proposed_block" block
-  py:set "sending_peer" [peer-id] of self ;; For request-blockchain method
-  ask peers [
-    receive-block block ([peer-id] of self) false
-  ]
-  ask peers with [peer-id = current-block-proposer-id ] [
-    let block_in_chain (py:runresult "pyagent.check_proposed_block_status(run_no, curr_proposer_id)")
-    if block_in_chain [
-      ;; reschedule_events 5
-    ]
-  ]
+to push-voted-block-to-peer [updated-block]
+  py:set "added_block" updated-block
+  py:set "peer_id" [peer-id] of self
+  let pushed (py:runresult "pyagent.push_voted_block_to_peer(run_no, peer_id, added_block)")
 end
 
-to request-blockchain [from_index to_index] ;; turtle-method
-  py:set "update_index_to" to_index
-  py:set "update_index_from" from_index
-  let transfer-success (py:runresult "pyagent.blockchain_request(run_no, p_id, sending_peer, update_index_from, update_index_to)") ;; TODO Change to most available peer if necessary
-  if not transfer-success [
-    console-log(word "Blockchain transfer successful :" transfer-success)
-  ]
+to poll-for-missing-transactions-and-blocks
+  if is-down [stop]
+  py:set "p_id" [peer-id] of self
+  py:run "pyagent.polling_actions(run_no, p_id)"
 end
 
-to remove_attacker_influence
+to remove-attacker-influence
   ask peers [
     if not is-down [ stop ]
     py:set "p_id" [peer-id] of self
@@ -258,21 +230,8 @@ to remove_attacker_influence
   ]
 end
 
-to-report get_proposer
-  py:set "prev_proposer_id" current-block-proposer-id
-  let candidate ""
-  while [candidate = ""] [
-    set candidate (py:runresult "pyagent.get_proposer(run_no, prev_proposer_id)")
-    ask peers with [peer-id = candidate] [
-      if is-down [ set candidate "" ]
-    ]
-  ]
-  py:set "curr_proposer_id" candidate
-  py:run "pyagent.complete_proposer_transfer(run_no, prev_proposer_id, curr_proposer_id)"
-  report candidate
-end
 
-to attack_agent
+to attack-agent
   py:set "p_id" [peer-id] of self
   set is-down (py:runresult "pyagent.attack_agent(run_no, p_id)")
   if not is-down [ stop ]

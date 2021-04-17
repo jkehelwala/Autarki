@@ -6,11 +6,10 @@ breed [peers peer]
 ;; breed [victims victim]
 breed [servers server]
 breed [attackers attacker]
-directed-link-breed [server-cons server-con]
+undirected-link-breed [server-cons server-con]
 directed-link-breed [attacker-cons attacker-con]
 undirected-link-breed [peer-cons peer-con]
 links-own [delay]
-
 
 attackers-own[
   blocks-to-attack
@@ -18,11 +17,13 @@ attackers-own[
 
 peers-own [
   peer-id 
-  con-strength 
-  allowed-link-no 
+  delay-from-server ;; Used instead of con-strength/ allowed-link-no
   is-down 
   transactions
-  block
+  ;; block
+  ;; con-strength     ;; NOTE: Unused at the moment
+  ;; allowed-link-no  ;; NOTE: Unused at the moment
+
   ;; strategies      ;; TODO list of strategies (from elfarol)
   ;; best-strategy   ;; TODO index of the current best strategy (from elfarol)
   ;; prediction      ;; TODO current prediction of the bar attendance
@@ -34,12 +35,10 @@ globals [
   battacker 
   current-round
   current-block
-  current-block-start-time
-  current-block-proposer-id
+  server-block
   
   ;; Timing related
   new-transaction-generation-time
-  ;; block-timeout block-start-time ;; for ticks (Not used atm)
   peer-breathe-time
   
   ;; Visualization Related

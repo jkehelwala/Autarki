@@ -1,3 +1,41 @@
 to force-timeout-for-block ;; TODO (NOT Used) Should not be possible at individual peers (But if the loop is stuck without tick-advance cannot enforce this elsewhere)
   if ticks > (block-start-time + block-timeout) [ reschedule_events 5 ]
 end
+
+
+to set-up-peer-link-data ;; Inside create-peers
+  set con-strength Min-Con-Strength +  random (Max-Con-Strength - Min-Con-Strength)
+  set allowed-link-no Min-Peer-Cons + random (Max-Peer-Cons - Min-Peer-Cons)
+end
+
+to set-up-peer-links ;; Unused peer method for inter-peer-connections
+   ask peers [
+    let available-links [allowed-link-no] of self - (count my-peer-cons ) ;; leftover links than the default server/attacker connections
+    if available-links > 0 [
+      create-peer-cons-with n-of available-links other peers
+    ]
+    ask peer-cons [
+      set color turquoise
+      ;; set delay min(list [con-strength] of end1 [con-strength] of end2)
+      ;; set thickness delay /(last const-con-strength * 10) ;; TODO: Uncomment for visual confirmation
+    ]
+  ]
+end
+
+
+to poll-for-missing-transactions-and-blocks-old
+  if is-down [stop]
+  ;; if current-round = 1 and current-block = 0 [stop]
+  py:set "p_id" [peer-id] of self
+  let txn-and-block-data (py:runresult "pyagent.get_current_transactions_and_blocks(run_no, p_id)")
+  py:set "blockchain_length" item 0 txn-and-block-data
+  py:set "prev_block_id" item 1 txn-and-block-data
+  py:set "txn_key_list" item 2 txn-and-block-data
+  let updated-txn-and-block-list (py:runresult "pyagent.poll_for_data_update(run_no, blockchain_length, prev_block_id, txn_key_list)")
+  let expired item 0 updated-txn-and-block-list
+  if expired [
+    py:set "missing_block_list" item 1 updated-txn-and-block-list
+  py:set "missing_txn_list" item 2 updated-txn-and-block-list
+  py:run "pyagent.set_current_transactions_and_blocks(run_no, p_id, missing_block_list, missing_txn_list)"
+  ]
+end

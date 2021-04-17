@@ -8,7 +8,7 @@ to schedule_transaction_propagation
   let cur_time ticks
   time:schedule-repeating-event "observer" [ [] -> init_server_transaction ] cur_time new-transaction-generation-time ;; Initiate a new transaction every "new-transaction-generation-time" ticks 
   ask peers [
-    time:schedule-repeating-event self [ [] -> push_peer_transaction ] cur_time (con-strength + peer-breathe-time) ;; Push transaction depending on your connection strength + known constant
+    time:schedule-repeating-event self [ [] -> push_peer_transaction ] cur_time (delay-from-server + peer-breathe-time) ;; Push transaction depending on your connection strength + known constant
   ]
 end
 
@@ -21,7 +21,7 @@ to init_server_transaction
       if [is-down] of other-end [ stop ]
       time:schedule-event other-end ([ [] ->
         py:set "p_id" [peer-id] of self
-        set transactions (py:runresult "pyagent.propagate_to_peer(run_no, p_id, new_transaction)")
+        set transactions (py:runresult "pyagent.propagate_txn_to_peer(run_no, p_id, new_transaction)")
       ]) (tmp_ticks + [delay] of self)
     ]
   ]
@@ -35,7 +35,7 @@ to push_peer_transaction ;; turtle-method
       if [is-down] of other-end [ stop ]
       time:schedule-event other-end ([ [] ->
         py:set "p_id" [peer-id] of self
-        set transactions (py:runresult "pyagent.propagate_to_peer(run_no, p_id, new_prop_transaction)")
+        set transactions (py:runresult "pyagent.propagate_txn_to_peer(run_no, p_id, new_prop_transaction)")
       ]) (tmp_ticks + [delay] of self)
   ]
 end
@@ -54,7 +54,7 @@ to init_server_transaction_temp ;; Temporary for speed
     ask server-con-neighbors [
       if is-down [ stop ]
       py:set "p_id" peer-id
-      set transactions (py:runresult "pyagent.propagate_to_peer(run_no, p_id, new_transaction)")
+      set transactions (py:runresult "pyagent.propagate_txn_to_peer(run_no, p_id, new_transaction)")
     ]
   ]
 end
