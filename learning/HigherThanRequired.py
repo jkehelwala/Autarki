@@ -8,4 +8,4 @@ class HigherThanRequired(PeerLearningMethodology):
         super().__init__(peer)
 
     def is_investing_in_security(self):
-        return (self.peer.who_id % self.peer.total_peers) < self.peer.__votes_required
+        return (self.peer.who_id % self.peer.total_peers) < self.peer.votes_required

@@ -13,7 +13,7 @@ class Peer:
     def __init__(self, who_id, total_peers, count_of_votes_required, benefit_per_unit_of_cost, cost, learning_strategy,
                  tolerance):
         self.who_id = who_id  # Constant NetLogo Id For Reference only
-        self.__votes_required = count_of_votes_required
+        self.votes_required = count_of_votes_required
         self.node_id = str(uuid.uuid4())
         self.transactions = defaultdict(list)  # TODO
         self.blockchain = list()
@@ -131,7 +131,7 @@ class Peer:
 
     def accept_block(self):
         # logging.debug("Peer.accept_block")
-        if self.current_block.vote_count() < self.__votes_required:
+        if self.current_block.vote_count() < self.votes_required:
             return False
         self.accept_block_to_chain()  # TODO
         self.current_block_accepted = True
@@ -139,7 +139,7 @@ class Peer:
 
     def accept_block_to_chain(self):
         logging.debug("Peer.accept_block_to_chain : Accepting Block. Votes: %d/%d, By: %s",
-                      self.current_block.vote_count(), self.__votes_required, self.who_id)
+                      self.current_block.vote_count(), self.votes_required, self.who_id)
         self.blockchain.append(self.current_block)
         self.previous_block_signature = self.current_block.block_signature()
         self.purge_committed_transactions()
@@ -213,6 +213,6 @@ class Peer:
 
     def check_proposed_block_status(self):
         if not self.proposer_accepted:
-            self.proposer_accepted = self.current_block.vote_count() >= self.__votes_required
+            self.proposer_accepted = self.current_block.vote_count() >= self.votes_required
             logging.debug("Peer.check_proposed_block_status: %s", self.proposer_accepted)
         return self.proposer_accepted

@@ -12,7 +12,7 @@ to setup
 end
 
 to set-plots
-  set-plot-x-range 1 No-of-Peers
+  set-plot-x-range -1 No-of-Peers
   set-plot-y-range 0 100
 end
 
@@ -120,6 +120,7 @@ to setup_peers
 end
 
 to initiate_round
+  carefully [
   set current-round (current-round + 1)
   py:set "current_round" current-round
   set current-block 0
@@ -128,6 +129,8 @@ to initiate_round
   ask battacker [ set blocks-to-attack (py:runresult "pyagent.get_blocks_to_attack(run_no, current_round)")  ]
   ;; TODO bring forward remaining transactions if any (Check Readme)
   reschedule_events 10 ;; Start after at least 10 transactions
+  ]
+  [ console-log("ERROR: Round initiations ") ]
 end
 
 to reschedule_events [block_count]
@@ -152,8 +155,10 @@ end
 to initiate_block
   ask peers with [peer-id = current-block-proposer-id ] [
     console-log(word "Finished: Round: " current-round " Block: " current-block " Attack Tolerance: " attack_tolerance_data)
-    update-plots
-    plot-vote-precentage
+    carefully [ 
+      update-plots
+      plot-vote-precentage
+    ] [ console-log("ERROR: Plotting error") ]
   ]
   if (current-block + 1) > No-of-Peers [
     initiate_round
@@ -167,13 +172,13 @@ to initiate_block
       ask attacker-con-neighbors [ attack_agent ]
     ]
   ]
-  set current-block-proposer-id get_proposer
+  carefully [ set current-block-proposer-id get_proposer ] [ console-log("ERROR: Proposer error") ]
   py:set "curr_proposer_id" current-block-proposer-id
   py:set "curr_time" ticks
-  py:set current-block-start-time ticks
+  set current-block-start-time ticks
   ask peers with [peer-id = current-block-proposer-id ] [
     set block (py:runresult "pyagent.get_new_block(run_no, curr_proposer_id, curr_time)")
-    push-peer-block
+    carefully [push-peer-block] [console-log("ERROR : Initial block push")]
   ]
 end
 
@@ -209,20 +214,19 @@ to receive-block [proposed-block sending-peer recurse]
       time:schedule-event self [ [] -> push-peer-block ] (tmp_ticks + con-strength) ;; TODO This is problematic
     ]
     if was-accepted and recurse [ ;; fix for infinite loop
-      push-peer-block-to-all
+      carefully [push-peer-block-to-all] [console-log("ERROR : Final Block Push")]
     ]
   ]
 end
 
 
 to push-peer-block ;; turtle-method
-  if block != "{}" and not is-down  [
-    py:set "proposed_block" block
+  if block = "{}" or block = "" or is-down [ stop ]
+  py:set "proposed_block" block
     py:set "sending_peer" current-block-proposer-id ;; [peer-id] of self ;; For request-blockchain method
     ask out-peer-con-neighbors [
       receive-block block ([peer-id] of self) true
     ]
-  ]
 end
 
 to push-peer-block-to-all ;; turtle-method
@@ -233,13 +237,14 @@ to push-peer-block-to-all ;; turtle-method
   ]
   ask peers with [peer-id = current-block-proposer-id ] [
     let block_in_chain (py:runresult "pyagent.check_proposed_block_status(run_no, curr_proposer_id)")
-    if block_in_chain [
-      ;; reschedule_events 5
-    ]
+    ;; if block_in_chain [
+      reschedule_events 5 ;; But one block must success or this loops forever TODO
+    ;;]
   ]
 end
 
 to request-blockchain [from_index to_index] ;; turtle-method
+  console-log("Blockchain Request")
   py:set "update_index_to" to_index
   py:set "update_index_from" from_index
   let transfer-success (py:runresult "pyagent.blockchain_request(run_no, p_id, sending_peer, update_index_from, update_index_to)") ;; TODO Change to most available peer if necessary
