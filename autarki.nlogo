@@ -85,7 +85,7 @@ Votes-Required
 Votes-Required
 50.01
 99
-66.66
+50.01
 0.01
 1
 %
@@ -125,7 +125,7 @@ CHOOSER
 Learning-Methodology
 Learning-Methodology
 "Random" "> Required" "Reputation Maximization" "Regret Matching" "Bounded Rationality"
-0
+1
 
 SLIDER
 220
@@ -151,7 +151,7 @@ Duration
 Duration
 200
 10000
-500.0
+1000.0
 100
 1
 ticks
@@ -237,7 +237,7 @@ Min-Attack-Probability
 Min-Attack-Probability
 0
 1
-1.0
+0.11
 0.01
 1
 NIL
