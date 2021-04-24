@@ -124,7 +124,7 @@ CHOOSER
 100
 Learning-Methodology
 Learning-Methodology
-"Reputation Maximization" "Regret Matching" "Bounded Rationality"
+"> Required" "Reputation Maximization" "Regret Matching" "Bounded Rationality"
 0
 
 SLIDER

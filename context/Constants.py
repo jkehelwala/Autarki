@@ -13,9 +13,3 @@ class BlockConst:
     signature = "signature"
     votes = "votes"
     proposer = "proposer"
-
-
-class LearningTypes:
-    reputation_maximization = "Reputation Maximization"
-    regret_matching = "Regret Matching"
-    bounded_rationality = "Bounded Rationality"

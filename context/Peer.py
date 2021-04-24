@@ -80,9 +80,6 @@ class Peer:
         self.is_under_attack = False
 
     def set_protected(self):
-        if self.get_blocks_in_round() is None:
-            self.is_protected = bool(self.who_id % 2 != 0)  # TODO: Default
-            return
         self.chosen_strategy = LearningMethodologyFactory.get_learning_methodology(self.learning_choice, self)
         self.is_protected = self.chosen_strategy.is_investing_in_security()
 
