@@ -1,8 +1,10 @@
 from learning.HigherThanRequired import HigherThanRequired
+from learning.Random import Random
 from learning.ReputationMaximization import ReputationMaximization
 
 
 class LearningTypes:
+    random = "Random"
     higher_than_required = "> Required"
     reputation_maximization = "Reputation Maximization"
     regret_matching = "Regret Matching"
@@ -10,7 +12,11 @@ class LearningTypes:
 
 
 def get_learning_methodology(choice, peer):
+    if choice == LearningTypes.random:
+        return Random(peer)
     if peer.get_blocks_in_round() is None:
+        return HigherThanRequired(peer)
+    elif choice == LearningTypes.higher_than_required:
         return HigherThanRequired(peer)
     elif choice == LearningTypes.reputation_maximization:
         return ReputationMaximization(peer)
