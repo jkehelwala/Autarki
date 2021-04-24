@@ -26,7 +26,7 @@ to set_run
   py:set "is_cost_heterogeneous" Heterogeneous-Cost
   py:set "benefit_per_unit_of_cost" Benefit-Per-Unit-Of-Cost
   py:set "minimum_attack_probability" Min-Attack-Probability
-  py:set "desc_data" (list Duration Min-Con-Strength Max-Con-Strength Min-Peer-Cons Max-Peer-Cons)
+  py:set "desc_data" (list Rounds Min-Con-Strength Max-Con-Strength Min-Peer-Cons Max-Peer-Cons)
   py:run "pyagent.init_run(run_no, run_name, total_peers, required_votes, learning_strategy, is_cost_heterogeneous, benefit_per_unit_of_cost, minimum_attack_probability, desc_data)"
 end
 
@@ -42,10 +42,10 @@ to set_constants
 end
 
 to go
+  let arbritary-block-time-padding 10
+  let simulation-timeout (Rounds * No-of-Peers * (Block-Timeout + arbritary-block-time-padding) ) ;; Higher estimation for simulation timeout 
   initiate_round
-  time:go-until Duration;; (TODO: substitute ticks with number of rounds when termination is deterministic)
-  ;; py:run "pyagent.log_agent_chains(run_no)"
-  ;; ask peers [ console-log(list who transactions) ] ;; TODO
+  time:go-until simulation-timeout ;; time:go ;; TODO 
 end
 
 to-report current-round-no
@@ -120,8 +120,12 @@ to setup_peers
 end
 
 to initiate_round
-  carefully [
   set current-round (current-round + 1)
+  if current-round > Rounds + 1 [
+    time:clear-schedule
+    stop
+  ]
+  carefully [
   py:set "current_round" current-round
   set current-block 0
   remove_attacker_influence

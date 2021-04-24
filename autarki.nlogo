@@ -147,9 +147,9 @@ SLIDER
 130
 420
 163
-Duration
-Duration
-200
+Rounds
+Rounds
+100
 10000
 1000.0
 100

@@ -15,7 +15,7 @@ def get_learning_methodology(choice, peer):
     if choice == LearningTypes.random:
         return Random(peer)
     if peer.get_blocks_in_round() is None:
-        return HigherThanRequired(peer)
+        return Random(peer)
     elif choice == LearningTypes.higher_than_required:
         return HigherThanRequired(peer)
     elif choice == LearningTypes.reputation_maximization:
