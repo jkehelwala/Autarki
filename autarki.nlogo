@@ -51,7 +51,7 @@ BUTTON
 118
 Go
 go
-NIL
+T
 1
 T
 OBSERVER
@@ -59,7 +59,7 @@ NIL
 NIL
 NIL
 NIL
-1
+0
 
 SLIDER
 220
@@ -70,7 +70,7 @@ No-of-Peers
 No-of-Peers
 0
 200
-20.0
+100.0
 5
 1
 NIL
@@ -125,7 +125,7 @@ CHOOSER
 Learning-Methodology
 Learning-Methodology
 "Random" "> Required" "Reputation Maximization" "Regret Matching" "Bounded Rationality"
-1
+0
 
 SLIDER
 220
@@ -136,7 +136,7 @@ Block-Timeout
 Block-Timeout
 0
 1000
-45.0
+100.0
 5
 1
 ticks
@@ -151,10 +151,10 @@ Rounds
 Rounds
 100
 10000
-1000.0
+5.0
 100
 1
-ticks
+NIL
 HORIZONTAL
 
 PLOT
@@ -174,7 +174,7 @@ true
 "" ""
 PENS
 "Obtained" 1.0 0 -5298144 true "" ""
-"Required" 1.0 0 -16777216 true "" "plotxy overall-block Votes-Required"
+"Required" 1.0 0 -16777216 true "" ";; plot a threshold line\nplot-pen-reset\nplotxy 0 Votes-Required\nplotxy plot-x-max Votes-Required"
 
 MONITOR
 30
@@ -222,7 +222,7 @@ Max-Con-Strength
 Max-Con-Strength
 Min-Con-Strength
 10
-5.0
+3.0
 1
 1
 NIL
@@ -267,7 +267,7 @@ Max-Peer-Cons
 Max-Peer-Cons
 Min-Peer-Cons
 10
-4.0
+5.0
 1
 1
 NIL
@@ -276,9 +276,9 @@ HORIZONTAL
 MONITOR
 340
 440
-460
+457
 485
-Attack Tolerance
+Tolerant to attack
 attack_tolerance_data
 17
 1

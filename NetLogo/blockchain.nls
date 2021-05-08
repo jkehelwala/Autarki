@@ -1,0 +1,21 @@
+
+to add-block-vote [ voter ] ;; turtle-method
+  if not member? voter block-voters [
+     set block-voters lput voter block-voters
+  ]
+end
+
+
+
+to set-list-of-blocks-to-attack ;; attacker-method
+  let attack-prob ( Min-Attack-Probability + random-float (0.99 - Min-Attack-Probability) )
+  let no-of-blocks-to-attack ceiling(attack-prob * No-of-Peers) ;; or Floor?
+  set blocks-to-attack []
+  while [length blocks-to-attack < no-of-blocks-to-attack]
+  [ 
+    let b-no 1 + random No-of-Peers
+    if not member? b-no blocks-to-attack [
+     set blocks-to-attack lput b-no blocks-to-attack
+    ]
+  ]
+end

@@ -1,5 +1,5 @@
-extensions [ py time ]
-__includes [ "NetLogo/procs.nls" "NetLogo/procs_transactions.nls" ]
+extensions [  time ]
+__includes [ "NetLogo/procs.nls" "NetLogo/blockchain.nls" ]
 
 ;; define universal breeds
 breed [peers peer]
@@ -20,9 +20,11 @@ peers-own [
   peer-id 
   con-strength 
   allowed-link-no 
+  is-protected
   is-down 
-  transactions
   block
+  block-voters
+  chain
   ;; strategies      ;; TODO list of strategies (from elfarol)
   ;; best-strategy   ;; TODO index of the current best strategy (from elfarol)
   ;; prediction      ;; TODO current prediction of the bar attendance
@@ -33,12 +35,16 @@ globals [
   bserver 
   battacker 
   current-round
+  overall-block
+  proposed-chain
   current-block
   current-block-start-time
   current-block-proposer-id
   
+  ;; Calc Related
+  no-of-votes-required
+  
   ;; Timing related
-  new-transaction-generation-time
   ;; block-timeout block-start-time ;; for ticks (Not used atm)
   peer-breathe-time
   
@@ -51,5 +57,5 @@ globals [
 
 
 to console-log [logline]
-  output-print(word "0000-00-00 00:00:00 - NINFO - " logline)
+  output-print(word "INFO - " logline)
 end
