@@ -1,4 +1,3 @@
-extensions [  time ]
 __includes [ "NetLogo/procs.nls" "NetLogo/blockchain.nls" ]
 
 ;; define universal breeds
