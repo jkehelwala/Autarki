@@ -1,4 +1,4 @@
-__includes [ "NetLogo/procs.nls" "NetLogo/blockchain.nls" ]
+__includes [ "NetLogo/procs.nls" "NetLogo/learning.nls"]
 
 ;; define universal breeds
 breed [peers peer]
@@ -24,6 +24,17 @@ peers-own [
   block
   block-voters
   chain
+  roundchain
+  
+  ;; Cost/benefit Related
+  benefit-puoc
+  
+  ;; Reputation Maximization based parameters
+  peer-reputation
+  valid-probability
+  prev-f
+  
+  ;; Bounded Rationality Related
   ;; strategies      ;; TODO list of strategies (from elfarol)
   ;; best-strategy   ;; TODO index of the current best strategy (from elfarol)
   ;; prediction      ;; TODO current prediction of the bar attendance
@@ -35,10 +46,11 @@ globals [
   battacker 
   current-round
   overall-block
-  proposed-chain
+  last-proposed-block
   current-block
   current-block-start-time
   current-block-proposer-id
+  waiting-for-init
   
   ;; Calc Related
   no-of-votes-required
@@ -56,5 +68,5 @@ globals [
 
 
 to console-log [logline]
-  output-print(word "INFO - " logline)
+  output-print(word "LOG - " logline)
 end

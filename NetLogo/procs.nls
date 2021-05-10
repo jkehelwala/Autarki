@@ -1,7 +1,7 @@
 
 to setup
   clear-all
-  set proposed-chain []
+  set last-proposed-block ""
   set overall-block 0
   set_constants
   setup_peers
@@ -28,6 +28,7 @@ to set_constants
 end
 
 to scheduled-events
+  if waiting-for-init [stop]
   if ticks mod Block-Timeout = 0 [ initiate_block ]
   ask peers [
     if ticks mod con-strength = 0 [ push-peer-block ]
@@ -35,7 +36,7 @@ to scheduled-events
 end
 
 to go
-  if current-round > Rounds + 1 [ stop ] ;; Stopping forever button
+  if current-round > Rounds [ stop ] ;; Stopping forever button
   tick
   scheduled-events
 end
@@ -67,18 +68,30 @@ to setup_peers
   ]
   set bserver one-of servers
   set battacker one-of attackers
+  
+  let benefit-list benefit-assignment
   ;; Creating Peers
   create-peers No-of-Peers [
     ;; set color turquoise
     setxy random-pxcor random-pycor
     set peer-id (word "p_" who)
+    set benefit-puoc first benefit-list
+    set benefit-list remove-item 0 benefit-list ;; pop benefit
     set block ""
     set block-voters []
     set chain []
+    set roundchain []
     set is-protected False
     set is-down False
     set con-strength Min-Con-Strength +  random (Max-Con-Strength - Min-Con-Strength)
     set allowed-link-no Min-Peer-Cons + random (Max-Peer-Cons - Min-Peer-Cons)
+    
+    ;; Reputation Maximization
+    set peer-reputation 0
+    set valid-probability False
+    set prev-f 0
+    
+    
   ]
   ask bserver [
     create-server-cons-to other peers [
@@ -107,26 +120,33 @@ to setup_peers
 end
 
 to initiate_round
+  set waiting-for-init true
   set current-round (current-round + 1)
-  if current-round > Rounds + 1 [
+  if current-round > Rounds [
     console-log("Round number reached. Simulation will stop soon.")
     stop
   ]
   set current-block 0
   remove_attacker_influence
+  if current-round > 1 [
+    synchronize-current-round-chain
+    if (Learning-Methodology = "Reputation Maximization") [ ask peers [rm-set-reputation]  ]
+  ]
+  ask peers [ set chain [] ]
   ask peers [ set-peer-protection-decision ]  
   ask battacker [ set-list-of-blocks-to-attack  ]
+  set waiting-for-init false
 end
 
 to plot-vote-precentage
-  let obtained-votes-no count peers with [not empty? chain and first last chain = last proposed-chain] ;; first element (block string) of last item in chain = last element in proposed-chain 
+  let obtained-votes-no count peers with [not empty? chain and first last chain = last-proposed-block] ;; first element (block string) of last item in chain
   plotxy overall-block ( ( obtained-votes-no / No-of-Peers ) * 100 )
 end
 
 to initiate_block
   if overall-block > 0 [  
     ask peers [ finalize-proposed-block ]
-    console-log(word "Finished: Round: " current-round " Block: " current-block " Attack Tolerance: " attack_tolerance_data)
+    console-log(word "Finished: Round: " current-round " Block: " current-block " Overall Block: " overall-block " Attack Tolerance: " attack_tolerance_data)
     update-plots
     plot-vote-precentage 
   ]
@@ -136,18 +156,25 @@ to initiate_block
   ]
   set current-block (current-block + 1)
   set overall-block (overall-block + 1)
-  console-log(word "Started: Round: " current-round " Block: " current-block)
+  ;; console-log(word "Started: Round: " current-round " Block: " current-block " Overall Block: " overall-block)
   remove_attacker_influence
   if member? current-block [blocks-to-attack] of battacker [
     ask battacker [
       ask attacker-con-neighbors [ attack_agent ]
     ]
   ]
+  
+  ;; Confirm at least one proposer is available (Limitation)
+  let valid-proposers count peers with  [not is-down and peer-id != current-block-proposer-id ]
+  if valid-proposers = 0 [
+    ask one-of peers with  [peer-id != current-block-proposer-id ] [ remove_attacker_influence_for_peer ]
+  ]
+  
   ask one-of peers with  [not is-down and peer-id != current-block-proposer-id ] [ ;; ask new proposer
     set current-block-proposer-id peer-id
     set current-block-start-time ticks
     set block (word "b_" overall-block "_" current-block-proposer-id)
-    set proposed-chain lput block proposed-chain
+    set last-proposed-block block
     add-block-vote current-block-proposer-id
     push-peer-block
   ]
@@ -178,21 +205,44 @@ to push-peer-block ;; turtle-method
 end
 
 to finalize-proposed-block ;; turtle-method
-  if is-down [stop]
-  if length block-voters > no-of-votes-required [
-    set chain lput (list block block-voters) chain 
+  if not is-down [ 
+    if length block-voters > no-of-votes-required [
+      set chain lput (list block block-voters) chain 
+    ]
   ]
   set block ""
   set block-voters []
 end
 
 to remove_attacker_influence
+  ask peers [ remove_attacker_influence_for_peer ]
+end
+
+to remove_attacker_influence_for_peer
+  if not is-down [ stop ]
+  set is-down False
+  set shape "a_peer"
+end
+
+to synchronize-current-round-chain
   ask peers [
-    if not is-down [ stop ]
-    set is-down False
-    set shape "a_peer"
+    let parent-subchain-keys map first chain
+    let list-of-votes map last chain
+    ask other peers [
+      let peer-subchain-keys map first chain
+      let missing-keys filter [ i -> not member? i parent-subchain-keys ] peer-subchain-keys
+      ifelse (length missing-keys + length list-of-votes) > No-of-Peers [ console-log(" Filtering error. Skipping synchronization.") ]
+      [ ;; else
+        foreach missing-keys [ x -> 
+          let missing-item item (position x map first chain) chain
+          set list-of-votes lput (last missing-item) list-of-votes
+        ]
+      ]
+    ]
+    set roundchain lput list-of-votes roundchain
   ]
 end
+
 
 to attack_agent
   if not is-protected [
@@ -201,10 +251,32 @@ to attack_agent
   ] 
 end
 
-;; Below items are TODO
-
-to set-peer-protection-decision 
-  set is-protected one-of [ true false ]  ;; TODO 
+to add-block-vote [ voter ] ;; turtle-method
+  if not member? voter block-voters [
+     set block-voters lput voter block-voters
+  ]
 end
 
+to set-list-of-blocks-to-attack ;; attacker-method
+  let attack-prob ( Min-Attack-Probability + random-float (0.99 - Min-Attack-Probability) )
+  let no-of-blocks-to-attack ceiling(attack-prob * No-of-Peers) ;; or Floor?
+  set blocks-to-attack []
+  while [length blocks-to-attack < no-of-blocks-to-attack]
+  [ 
+    let b-no 1 + random No-of-Peers
+    if not member? b-no blocks-to-attack [
+     set blocks-to-attack lput b-no blocks-to-attack
+    ]
+  ]
+end
+
+to set-peer-protection-decision ;; peer method
+  set is-protected get-protection
+end
+
+
+to-report benefit-assignment
+  if not Heterogeneous-Cost [ report n-values No-of-Peers [ Benefit-Per-Unit-Of-Cost ] ]  ;; Homogeneous cost
+  report map [ i -> Benefit-Per-Unit-Of-Cost / i ] n-values No-of-Peers [ random-normal 1.0 Cost-Std-Dev ]  ;; Heterogenous cost
+end
 

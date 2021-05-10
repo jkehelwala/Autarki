@@ -284,6 +284,28 @@ attack_tolerance_data
 1
 11
 
+OUTPUT
+25
+605
+970
+680
+11
+
+SLIDER
+837
+115
+1009
+148
+Cost-Std-Dev
+Cost-Std-Dev
+0.025
+0.125
+0.125
+0.025
+1
+NIL
+HORIZONTAL
+
 @#$#@#$#@
 ## WHAT IS IT?
 

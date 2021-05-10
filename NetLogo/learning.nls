@@ -1,0 +1,54 @@
+;; Individual peer methods
+
+to-report get-protection
+  if overall-block <= 0 [ report random-protection ]
+  (ifelse
+    Learning-Methodology = "Reputation Maximization" [
+      report reputation-maximization
+    ]
+    Learning-Methodology = "Regret Matching" [
+      user-message (word "Learning Methodology Not implemented.")
+    ]
+    Learning-Methodology = "Bounded Rationality" [
+      user-message (word "Learning Methodology Not implemented.")
+    ]
+    Learning-Methodology = "> Required" [ report higher-than-required-protection  ]
+    [ report random-protection  ] ;; defaulting to random
+  )
+end
+
+to-report higher-than-required-protection
+  report (who mod No-of-Peers) < no-of-votes-required + 1
+end
+
+to-report random-protection 
+  report one-of [ true false ]
+end
+
+to-report reputation-maximization
+  if not valid-probability [ report random-protection ] ;; To ensure f = 1 (strategy assumption) could use higher-than-required-protection
+  let tolerance (1 - ( Votes-Required / 100 ))
+  let limit-divisor (benefit-puoc * (1 - (2 * tolerance))) ;; TODO with prev-f or without??? 
+  if limit-divisor <= 0 [ 
+    console-log("func(reputation-maximization) - Invalid divisor. Defaulting to random investment.")
+    report random-protection 
+  ]
+  let reputation_limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8
+  let investment peer-reputation < reputation_limit
+  console-test(word "func(reputation-maximization) - Round " current-round " Divisor: " limit-divisor " Limit: " reputation_limit " Reputation " peer-reputation " Investment " investment) 
+  report investment
+end
+
+
+to rm-set-reputation
+  let list-of-voter-lists last roundchain
+  let no-of-accepted-blocks length list-of-voter-lists
+  let counted-votes length chain
+  ifelse no-of-accepted-blocks > 1 [ set peer-reputation (counted-votes / no-of-accepted-blocks ) ] [ set peer-reputation 0 ]
+  set prev-f (length list-of-voter-lists / No-of-Peers )
+  let fbr (peer-reputation * prev-f * benefit-puoc)
+  set valid-probability (fbr >= 1)
+  let prob 0
+  if valid-probability [ set prob ( 1 / ( 2 - (1 / fbr ) ) ) ]
+  console-test(word "func(rm-set-reputation) >> Round " current-round " fbr: " fbr " prev_f: "  prev-f " rep: " peer-reputation " b: " benefit-puoc " validity: " valid-probability " prob: " prob)  
+end
