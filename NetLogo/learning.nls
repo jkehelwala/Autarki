@@ -3,6 +3,9 @@
 to-report get-protection
   if overall-block <= 0 [ report random-protection ]
   (ifelse
+    Learning-Methodology = "Mixed Strategy" [
+      report mixed-strategy-protection
+    ]
     Learning-Methodology = "Reputation Maximization" [
       report reputation-maximization
     ]
@@ -23,6 +26,14 @@ end
 
 to-report random-protection 
   report one-of [ true false ]
+end
+
+to-report mixed-strategy-protection ;; peer method
+  if not valid-probability [ report random-protection ]
+  let items [ true false ]
+  let weights (list mixed-strategy-prob  (1 - mixed-strategy-prob))
+  report first rnd:weighted-one-of-list (map list items weights) last  
+  ;; weights are the second column (last), return (first) from picked key-val pair  (https://stackoverflow.com/a/41902311 )
 end
 
 to-report reputation-maximization
@@ -48,7 +59,7 @@ to rm-set-reputation
   set prev-f (length list-of-voter-lists / No-of-Peers )
   let fbr (peer-reputation * prev-f * benefit-puoc)
   set valid-probability (fbr >= 1)
-  let prob 0
-  if valid-probability [ set prob ( 1 / ( 2 - (1 / fbr ) ) ) ]
-  console-test(word "func(rm-set-reputation) >> Round " current-round " fbr: " fbr " prev_f: "  prev-f " rep: " peer-reputation " b: " benefit-puoc " validity: " valid-probability " prob: " prob)  
+  set mixed-strategy-prob 0
+  if valid-probability [ set mixed-strategy-prob ( 1 / ( 2 - (1 / fbr ) ) ) ]
+  console-test(word "func(rm-set-reputation) >> Round " current-round " fbr: " fbr " prev_f: "  prev-f " rep: " peer-reputation " b: " benefit-puoc " validity: " valid-probability " prob: " mixed-strategy-prob)  
 end

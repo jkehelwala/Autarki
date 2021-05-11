@@ -22,3 +22,23 @@ end
     console-log("func(rm-set-reputation) - Invalid number of blocks recorded.")
     set list-of-voter-lists map last chain
   ]
+
+
+  to synchronize-current-round-chain-2
+  ask peers [
+    let parent-subchain-keys map first chain
+    let list-of-votes map last chain
+    ask other peers [
+      let peer-subchain-keys map first chain
+      let missing-keys filter [ i -> not member? i parent-subchain-keys ] peer-subchain-keys
+      ifelse (length missing-keys + length list-of-votes) > No-of-Peers [ console-log(" Filtering error. Skipping synchronization.") ]
+      [ ;; else
+        foreach missing-keys [ x ->
+          let missing-item item (position x map first chain) chain
+          set list-of-votes lput (last missing-item) list-of-votes
+        ]
+      ]
+    ]
+    set roundchain lput list-of-votes roundchain
+  ]
+end

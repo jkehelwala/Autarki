@@ -225,19 +225,22 @@ to remove_attacker_influence_for_peer
 end
 
 to synchronize-current-round-chain
+  let added-blocks []
+  ask peers [ set added-blocks sentence added-blocks map first chain ]
+  set added-blocks remove-duplicates added-blocks
   ask peers [
-    let parent-subchain-keys map first chain
     let list-of-votes map last chain
-    ask other peers [
-      let peer-subchain-keys map first chain
-      let missing-keys filter [ i -> not member? i parent-subchain-keys ] peer-subchain-keys
-      ifelse (length missing-keys + length list-of-votes) > No-of-Peers [ console-log(" Filtering error. Skipping synchronization.") ]
-      [ ;; else
-        foreach missing-keys [ x -> 
-          let missing-item item (position x map first chain) chain
-          set list-of-votes lput (last missing-item) list-of-votes
-        ]
-      ]
+    let parent-chain-keys map first chain
+    let missing-keys filter [ i -> not (member? i parent-chain-keys)  ] added-blocks
+    if (length missing-keys + length list-of-votes) > No-of-Peers [ 
+      console-log(word " Filtering error. Skipping synchronization. " length missing-keys  " " length list-of-votes ) 
+      syshalt
+    ]
+    foreach missing-keys [ x -> 
+      ask one-of peers with  [position x map first chain != false ] [
+        let missing-item item (position x map first chain) chain
+        set list-of-votes lput (last missing-item) list-of-votes
+      ]  
     ]
     set roundchain lput list-of-votes roundchain
   ]

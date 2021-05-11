@@ -1,3 +1,4 @@
+extensions [ rnd ]
 __includes [ "NetLogo/procs.nls" "NetLogo/learning.nls"]
 
 ;; define universal breeds
@@ -33,6 +34,7 @@ peers-own [
   peer-reputation
   valid-probability
   prev-f
+  mixed-strategy-prob
   
   ;; Bounded Rationality Related
   ;; strategies      ;; TODO list of strategies (from elfarol)
