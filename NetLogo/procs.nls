@@ -86,10 +86,16 @@ to setup_peers
     set con-strength Min-Con-Strength +  random (Max-Con-Strength - Min-Con-Strength)
     set allowed-link-no Min-Peer-Cons + random (Max-Peer-Cons - Min-Peer-Cons)
     
-    ;; Reputation Maximization
+    set effective-availability 0
+    set prev-peer-reputation 1
     set peer-reputation 0
-    set valid-probability False
     set prev-f 0
+
+    ;; Reputation Maximization    
+    set valid-probability False
+    
+    ;; Regret Matching
+    set regrets []
     
     
   ]
@@ -130,9 +136,12 @@ to initiate_round
   remove_attacker_influence
   if current-round > 1 [
     synchronize-current-round-chain
-    if (Learning-Methodology = "Reputation Maximization") [ ask peers [rm-set-reputation]  ]
+    ask peers [ 
+      set prev-peer-reputation peer-reputation
+      set-reputation
+      set chain [] 
+    ]
   ]
-  ask peers [ set chain [] ]
   ask peers [ set-peer-protection-decision ]  
   ask battacker [ set-list-of-blocks-to-attack  ]
   set waiting-for-init false
@@ -261,8 +270,8 @@ to add-block-vote [ voter ] ;; turtle-method
 end
 
 to set-list-of-blocks-to-attack ;; attacker-method
-  let attack-prob ( Min-Attack-Probability + random-float (0.99 - Min-Attack-Probability) )
-  let no-of-blocks-to-attack ceiling(attack-prob * No-of-Peers) ;; or Floor?
+  set current-round-mu ( Min-Attack-Probability + random-float (0.99 - Min-Attack-Probability) )
+  let no-of-blocks-to-attack ceiling(current-round-mu * No-of-Peers) ;; or Floor?
   set blocks-to-attack []
   while [length blocks-to-attack < no-of-blocks-to-attack]
   [ 

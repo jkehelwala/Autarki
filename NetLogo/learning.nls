@@ -9,8 +9,14 @@ to-report get-protection
     Learning-Methodology = "Reputation Maximization" [
       report reputation-maximization
     ]
+    Learning-Methodology = "Reputation Maximization (with f)" [
+      report reputation-maximization-alt
+    ]
     Learning-Methodology = "Regret Matching" [
-      user-message (word "Learning Methodology Not implemented.")
+      report regret-matching
+    ]
+    Learning-Methodology = "Regret Matching (with History)" [
+      report regret-matching-alt
     ]
     Learning-Methodology = "Bounded Rationality" [
       user-message (word "Learning Methodology Not implemented.")
@@ -29,19 +35,18 @@ to-report random-protection
 end
 
 to-report mixed-strategy-protection ;; peer method
+  ;; Assuming prev-f gives an accurate estimate for next round's f (Limitation)
   if not valid-probability [ report random-protection ]
-  let items [ true false ]
   let weights (list mixed-strategy-prob  (1 - mixed-strategy-prob))
-  report first rnd:weighted-one-of-list (map list items weights) last  
-  ;; weights are the second column (last), return (first) from picked key-val pair  (https://stackoverflow.com/a/41902311 )
+  report weighted-decision weights 
 end
 
-to-report reputation-maximization
-  if not valid-probability [ report random-protection ] ;; To ensure f = 1 (strategy assumption) could use higher-than-required-protection
+to-report reputation-maximization ;; Without prev-f 
+  if not valid-probability [ report true ] ;; To ensure f = 1 (strategy assumption)
   let tolerance (1 - ( Votes-Required / 100 ))
   let limit-divisor (benefit-puoc * (1 - (2 * tolerance))) ;; TODO with prev-f or without??? 
   if limit-divisor <= 0 [ 
-    console-log("func(reputation-maximization) - Invalid divisor. Defaulting to random investment.")
+    console-log("func(reputation-maximization) - Invalid divisor. Defaulting to random.")
     report random-protection 
   ]
   let reputation_limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8
@@ -51,15 +56,82 @@ to-report reputation-maximization
 end
 
 
-to rm-set-reputation
+to-report reputation-maximization-alt ;; With prev-f 
+  if not valid-probability [ report random-protection ] 
+  let tolerance (1 - ( Votes-Required / 100 ))
+  let limit-divisor (prev-f * benefit-puoc * (1 - (2 * tolerance))) ;; TODO with prev-f or without??? 
+  if limit-divisor <= 0 [ 
+    console-log("func(reputation-maximization) - Invalid divisor. Defaulting to random.")
+    report random-protection 
+  ]
+  let reputation_limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8
+  let investment peer-reputation < reputation_limit
+  console-test(word "func(reputation-maximization) - Round " current-round " Divisor: " limit-divisor " Limit: " reputation_limit " Reputation " peer-reputation " Investment " investment) 
+  report investment
+end
+
+
+to set-reputation
   let list-of-voter-lists last roundchain
   let no-of-accepted-blocks length list-of-voter-lists
   let counted-votes length chain
-  ifelse no-of-accepted-blocks > 1 [ set peer-reputation (counted-votes / no-of-accepted-blocks ) ] [ set peer-reputation 0 ]
+  set effective-availability 0
+  if no-of-accepted-blocks > 1 [ set effective-availability (counted-votes / no-of-accepted-blocks ) ]
+  let total-protection count peers with [is-protected] ;; This value could change depending on Block-Timeout based vote exclusions
   set prev-f (length list-of-voter-lists / No-of-Peers )
+  let divisor (total-protection + (1 / prev-f) * ( No-of-Peers - total-protection) * ( 1 - current-round-mu))
+  set peer-reputation 0
+  if divisor > 0 [ set peer-reputation ( (No-of-Peers * effective-availability) / divisor ) ]
   let fbr (peer-reputation * prev-f * benefit-puoc)
   set valid-probability (fbr >= 1)
   set mixed-strategy-prob 0
   if valid-probability [ set mixed-strategy-prob ( 1 / ( 2 - (1 / fbr ) ) ) ]
   console-test(word "func(rm-set-reputation) >> Round " current-round " fbr: " fbr " prev_f: "  prev-f " rep: " peer-reputation " b: " benefit-puoc " validity: " valid-probability " prob: " mixed-strategy-prob)  
+end
+
+;; Regret Matching
+
+to-report get-utility [protected]
+  let a_t ifelse-value protected [ 1 ] [ 0 ]
+  report No-of-Peers * ((prev-f * prev-peer-reputation * effective-availability * benefit-puoc ) - a_t )
+end
+
+to-report weighted-decision [weights]
+  let items [ true false ]
+  report first rnd:weighted-one-of-list (map list items weights) last  
+  ;; weights are the second column (last), return (first) from picked key-val pair  (https://stackoverflow.com/a/41902311 )
+end
+
+to-report regret-matching
+  let u-true get-utility true
+  let u-false get-utility false
+  let u-curr get-utility is-protected
+  
+  let regret-true max list (u-true - u-curr) 0
+  let regret-false max list (u-false - u-curr) 0
+  let regret-sum (regret-true + regret-false)
+  
+  if regret-sum <= 0 [
+    console-log("func(regret-matching) - No regret preference. Defaulting to random.")
+    report random-protection 
+  ]
+  let weights (list (regret-true / regret-sum) (regret-false / regret-sum))
+  set regrets lput weights regrets
+  report weighted-decision weights   
+end
+
+
+to-report regret-matching-alt
+  let regret-calc regret-matching ;; unused variable
+    
+  let regret-true sum map first regrets
+  let regret-false sum map last regrets
+  let regret-sum (regret-true + regret-false)
+  
+  if regret-sum <= 0 [
+    console-log("func(regret-matching-alt) - No regret preference. Defaulting to random.")
+    report random-protection 
+  ]
+  let weights (list (regret-true / regret-sum) (regret-false / regret-sum))
+  report weighted-decision weights   
 end

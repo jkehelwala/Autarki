@@ -27,14 +27,20 @@ peers-own [
   chain
   roundchain
   
-  ;; Cost/benefit Related
+  ;; Utility Related
   benefit-puoc
+  prev-f
+  effective-availability
+  prev-peer-reputation
+  peer-reputation
+  
   
   ;; Reputation Maximization based parameters
-  peer-reputation
   valid-probability
-  prev-f
   mixed-strategy-prob
+  
+  ;; Regret with history
+  regrets
   
   ;; Bounded Rationality Related
   ;; strategies      ;; TODO list of strategies (from elfarol)
@@ -47,6 +53,7 @@ globals [
   bserver 
   battacker 
   current-round
+  current-round-mu
   overall-block
   last-proposed-block
   current-block
