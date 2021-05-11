@@ -1,5 +1,5 @@
 extensions [ rnd ]
-__includes [ "NetLogo/procs.nls" "NetLogo/learning.nls"]
+__includes [ "NetLogo/procs.nls" "NetLogo/learning.nls" "NetLogo/elfarol.nls"]
 
 ;; define universal breeds
 breed [peers peer]
@@ -43,9 +43,9 @@ peers-own [
   regrets
   
   ;; Bounded Rationality Related
-  ;; strategies      ;; TODO list of strategies (from elfarol)
-  ;; best-strategy   ;; TODO index of the current best strategy (from elfarol)
-  ;; prediction      ;; TODO current prediction of the bar attendance
+  strategies      ;; list of strategies
+  best-strategy   ;; index of the current best strategy
+  prediction      ;; current prediction of the bar attendance
 ]
 
 
@@ -59,23 +59,29 @@ globals [
   current-block
   current-block-start-time
   current-block-proposer-id
-  waiting-for-init
-  
+  init?
+  total-protection
+    
   ;; Calc Related
   no-of-votes-required
   
+  ;; Bounded Rationality Related
+  ef-history
+  ef-memory-size
+  ef-number-strategies
+
   ;; Timing related
   ;; block-timeout block-start-time ;; for ticks (Not used atm)
   peer-breathe-time
-  
   ;; Visualization Related
   subdue-color ;;  To make non-neighbour links less visible
-  
-  ;; Transaction Propogation related (Not used atm)
-  first-contact
 ]
 
 
 to console-log [logline]
   output-print(word "LOG - " logline)
+end
+
+to console-test [logline]
+  print(word "TST - " logline)
 end

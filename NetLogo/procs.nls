@@ -1,10 +1,9 @@
 
 to setup
   clear-all
-  set last-proposed-block ""
-  set overall-block 0
-  set_constants
-  setup_peers
+  init-globals
+  set-constants
+  setup-peers
   reset-ticks ;; start the clock
   set-plots
   initiate_round
@@ -15,8 +14,14 @@ to set-plots
   set-plot-y-range 0 100
 end
 
+to init-globals
+  set last-proposed-block ""
+  set overall-block 0
+  set total-protection 0
+  ef-global-init ;; For elfarol
+end
 
-to set_constants
+to set-constants
   set no-of-votes-required ceiling( No-of-Peers  * ( Votes-Required / 100 ) )
   set-default-shape peers "a_peer"
   ;; Constant setup
@@ -28,7 +33,7 @@ to set_constants
 end
 
 to scheduled-events
-  if waiting-for-init [stop]
+  if init? [stop]
   if ticks mod Block-Timeout = 0 [ initiate_block ]
   ask peers [
     if ticks mod con-strength = 0 [ push-peer-block ]
@@ -54,7 +59,7 @@ to-report attack_tolerance_data ;; Possibility of protection being enough for th
   report (word count peers with [is-down] "/" (No-of-Peers - no-of-votes-required ) )
 end
 
-to setup_peers
+to setup-peers
   ;; Creating Servers
   create-servers 1 [
     set color blue
@@ -91,11 +96,9 @@ to setup_peers
     set peer-reputation 0
     set prev-f 0
 
-    ;; Reputation Maximization    
-    set valid-probability False
-    
-    ;; Regret Matching
-    set regrets []
+    set valid-probability False ;; Reputation Maximization    
+    set regrets [] ;; Regret Matching  
+    ef-init ;; El Farol
     
     
   ]
@@ -126,7 +129,7 @@ to setup_peers
 end
 
 to initiate_round
-  set waiting-for-init true
+  set init? true
   set current-round (current-round + 1)
   if current-round > Rounds [
     console-log("Round number reached. Simulation will stop soon.")
@@ -136,6 +139,7 @@ to initiate_round
   remove_attacker_influence
   if current-round > 1 [
     synchronize-current-round-chain
+    set total-protection count peers with [is-protected] ;; This value could change depending on Block-Timeout based vote exclusions
     ask peers [ 
       set prev-peer-reputation peer-reputation
       set-reputation
@@ -143,8 +147,9 @@ to initiate_round
     ]
   ]
   ask peers [ set-peer-protection-decision ]  
+  ef-learning-updates ;; For elfarol only
   ask battacker [ set-list-of-blocks-to-attack  ]
-  set waiting-for-init false
+  set init? false
 end
 
 to plot-vote-precentage
@@ -243,7 +248,6 @@ to synchronize-current-round-chain
     let missing-keys filter [ i -> not (member? i parent-chain-keys)  ] added-blocks
     if (length missing-keys + length list-of-votes) > No-of-Peers [ 
       console-log(word " Filtering error. Skipping synchronization. " length missing-keys  " " length list-of-votes ) 
-      syshalt
     ]
     foreach missing-keys [ x -> 
       ask one-of peers with  [position x map first chain != false ] [

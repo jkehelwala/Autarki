@@ -19,7 +19,7 @@ to-report get-protection
       report regret-matching-alt
     ]
     Learning-Methodology = "Bounded Rationality" [
-      user-message (word "Learning Methodology Not implemented.")
+      report ef-learning
     ]
     Learning-Methodology = "> Required" [ report higher-than-required-protection  ]
     [ report random-protection  ] ;; defaulting to random
@@ -77,7 +77,6 @@ to set-reputation
   let counted-votes length chain
   set effective-availability 0
   if no-of-accepted-blocks > 1 [ set effective-availability (counted-votes / no-of-accepted-blocks ) ]
-  let total-protection count peers with [is-protected] ;; This value could change depending on Block-Timeout based vote exclusions
   set prev-f (length list-of-voter-lists / No-of-Peers )
   let divisor (total-protection + (1 / prev-f) * ( No-of-Peers - total-protection) * ( 1 - current-round-mu))
   set peer-reputation 0
