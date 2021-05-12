@@ -44,11 +44,12 @@ to scheduled-events
   ]
 end
 
+to-report end-simulation
+  report current-round > Rounds
+end
+
 to go
-  if current-round > Rounds [ 
-    export-experiment
-    stop ;; Stopping forever button
-  ]
+  if end-simulation [ stop ] ;; Stopping forever button
   tick
   scheduled-events
 end
@@ -138,7 +139,7 @@ end
 to initiate_round
   set init? true
   set current-round (current-round + 1)
-  if current-round > Rounds [
+  if end-simulation [
     console-log("Round number reached. Simulation will stop soon.")
     stop
   ]
@@ -311,10 +312,3 @@ to-report benefit-assignment
   report map [ i -> Benefit-Per-Unit-Of-Cost / i ] n-values No-of-Peers [ random-normal 1.0 Cost-Std-Dev ]  ;; Heterogenous cost
 end
 
-to export-experiment
-  let exp_name (word behaviorspace-run-number "_" behaviorspace-experiment-name)
-  export-interface (word "output/img_" exp_name ".png")
-  export-plot "Block Acceptance" (word "output/tbl_ba_" exp_name ".csv")
-  export-plot "Total Protection" (word "output/tbl_tp_" exp_name ".csv")
-  ;; export-all-plots (word "output/plots_" exp_name ".csv")
-end

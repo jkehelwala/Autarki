@@ -85,3 +85,16 @@ end
 to console-test [logline]
   print(word "TST - " logline)
 end
+
+to export-experiment
+  let ts date-and-time
+  let fsuffix (word  (substring ts 16 18) "_" (substring ts 0 2) "_" (substring ts 3 5) "_" (substring ts 6 8) "_" (substring ts 9 12) "_" (substring ts 13 16) ) 
+  let exp_name (word behaviorspace-run-number "_" behaviorspace-experiment-name "_" fsuffix)
+  export-interface (word "output/img_" exp_name ".png")
+  export-plot "Block Acceptance" (word "output/tbl_ba_" exp_name ".csv")
+  export-plot "Total Protection" (word "output/tbl_tp_" exp_name ".csv")
+  ;; export-all-plots (word "output/plots_" exp_name ".csv")
+  output-print(word "Completed: " exp_name)
+  repeat 3 [ beep wait 0.1 ]
+end
+

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE experiments SYSTEM "behaviorspace.dtd">
 <experiments>
-  <experiment name="initial_exp" repetitions="2" runMetricsEveryStep="true">
+  <experiment name="experiment1" repetitions="1" sequentialRunOrder="false" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <metric>count turtles</metric>
+    <final>export-experiment</final>
+    <exitCondition>end-simulation</exitCondition>
     <enumeratedValueSet variable="Block-Timeout">
       <value value="25"/>
     </enumeratedValueSet>
@@ -17,11 +18,11 @@
     <enumeratedValueSet variable="Heterogeneous-Cost">
       <value value="false"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="Rounds">
+      <value value="5"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
       <value value="&quot;Reputation Maximization&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Rounds">
-      <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Strength">
       <value value="6"/>
