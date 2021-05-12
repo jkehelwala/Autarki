@@ -2,4 +2,5 @@ __pycache__/
 .idea/
 autarki.sublime-*
 logs/
-ledger/State
+output/
+!output/.ph
