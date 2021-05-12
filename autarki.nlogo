@@ -83,19 +83,19 @@ SLIDER
 113
 Votes-Required
 Votes-Required
-50.01
+50.1
 99
-50.01
-0.01
+50.1
+0.1
 1
 %
 HORIZONTAL
 
 SWITCH
-985
-60
-1140
-93
+930
+55
+1085
+88
 Heterogeneous-Cost
 Heterogeneous-Cost
 1
@@ -103,10 +103,10 @@ Heterogeneous-Cost
 -1000
 
 SLIDER
-820
-60
-975
-93
+765
+100
+920
+133
 Benefit-Per-Unit-Of-Cost
 Benefit-Per-Unit-Of-Cost
 1
@@ -118,14 +118,14 @@ NIL
 HORIZONTAL
 
 CHOOSER
-490
+510
 55
-645
+737
 100
 Learning-Methodology
 Learning-Methodology
 "Random" "> Required" "Mixed Strategy" "Reputation Maximization" "Reputation Maximization (with f)" "Regret Matching" "Regret Matching (with History)" "Bounded Rationality"
-5
+3
 
 SLIDER
 220
@@ -136,7 +136,7 @@ Block-Timeout
 Block-Timeout
 0
 1000
-100.0
+25.0
 5
 1
 ticks
@@ -149,10 +149,10 @@ SLIDER
 163
 Rounds
 Rounds
+10
 100
-10000
-5.0
-100
+20.0
+10
 1
 NIL
 HORIZONTAL
@@ -207,7 +207,7 @@ Min-Con-Strength
 Min-Con-Strength
 1
 Max-Con-Strength
-1.0
+6.0
 1
 1
 NIL
@@ -222,22 +222,22 @@ Max-Con-Strength
 Max-Con-Strength
 Min-Con-Strength
 10
-3.0
+9.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-655
-60
-810
-93
+765
+55
+920
+88
 Min-Attack-Probability
 Min-Attack-Probability
 0
 1
-0.11
+0.1
 0.01
 1
 NIL
@@ -267,7 +267,7 @@ Max-Peer-Cons
 Max-Peer-Cons
 Min-Peer-Cons
 10
-5.0
+6.0
 1
 1
 NIL
@@ -284,27 +284,39 @@ attack_tolerance_data
 1
 11
 
-OUTPUT
-25
-605
-970
-680
-11
-
 SLIDER
-837
-115
-1009
-148
+930
+100
+1085
+133
 Cost-Std-Dev
 Cost-Std-Dev
 0.025
 0.125
-0.125
+0.025
 0.025
 1
 NIL
 HORIZONTAL
+
+PLOT
+505
+270
+910
+440
+Total Protection
+Round
+NIL
+0.0
+10.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"Invested" 1.0 0 -5298144 true "" ""
+"Required" 1.0 0 -7500403 true "" ";; plot a threshold line\nplot-pen-reset\nplotxy 0 Votes-Required\nplotxy plot-x-max Votes-Required"
 
 @#$#@#$#@
 ## WHAT IS IT?

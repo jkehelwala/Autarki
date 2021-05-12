@@ -10,7 +10,11 @@ to setup
 end
 
 to set-plots
+  set-current-plot "Block Acceptance"
   set-plot-x-range -1 No-of-Peers
+  set-plot-y-range 0 100
+  set-current-plot "Total Protection"  
+  set-plot-x-range 0 Rounds
   set-plot-y-range 0 100
 end
 
@@ -86,7 +90,7 @@ to setup-peers
     set block-voters []
     set chain []
     set roundchain []
-    set is-protected False
+    set protected? False
     set is-down False
     set con-strength Min-Con-Strength +  random (Max-Con-Strength - Min-Con-Strength)
     set allowed-link-no Min-Peer-Cons + random (Max-Peer-Cons - Min-Peer-Cons)
@@ -139,7 +143,7 @@ to initiate_round
   remove_attacker_influence
   if current-round > 1 [
     synchronize-current-round-chain
-    set total-protection count peers with [is-protected] ;; This value could change depending on Block-Timeout based vote exclusions
+    set-total-protection
     ask peers [ 
       set prev-peer-reputation peer-reputation
       set-reputation
@@ -150,10 +154,18 @@ to initiate_round
   ef-learning-updates ;; For elfarol only
   ask battacker [ set-list-of-blocks-to-attack  ]
   set init? false
+  tick-advance (Block-Timeout - (ticks mod Block-Timeout) + 1 )
+end
+
+to set-total-protection
+  set total-protection count peers with [protected?] ;; This value could change depending on Block-Timeout based vote exclusions
+  set-current-plot "Total Protection"  
+  plotxy current-round ( ( total-protection / No-of-Peers ) * 100 )
 end
 
 to plot-vote-precentage
   let obtained-votes-no count peers with [not empty? chain and first last chain = last-proposed-block] ;; first element (block string) of last item in chain
+  set-current-plot "Block Acceptance"
   plotxy overall-block ( ( obtained-votes-no / No-of-Peers ) * 100 )
 end
 
@@ -261,7 +273,7 @@ end
 
 
 to attack_agent
-  if not is-protected [
+  if not protected? [
     set is-down True
     set shape "a_victim"
   ] 
@@ -287,7 +299,7 @@ to set-list-of-blocks-to-attack ;; attacker-method
 end
 
 to set-peer-protection-decision ;; peer method
-  set is-protected get-protection
+  set protected? get-protection
 end
 
 

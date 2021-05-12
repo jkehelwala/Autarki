@@ -20,7 +20,7 @@ peers-own [
   peer-id 
   con-strength 
   allowed-link-no 
-  is-protected
+  protected?
   is-down 
   block
   block-voters

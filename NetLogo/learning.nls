@@ -42,7 +42,7 @@ to-report mixed-strategy-protection ;; peer method
 end
 
 to-report reputation-maximization ;; Without prev-f 
-  if not valid-probability [ report true ] ;; To ensure f = 1 (strategy assumption)
+  if not valid-probability [ report random-protection ] ;; To ensure f = 1 (strategy assumption)
   let tolerance (1 - ( Votes-Required / 100 ))
   let limit-divisor (benefit-puoc * (1 - (2 * tolerance))) ;; TODO with prev-f or without??? 
   if limit-divisor <= 0 [ 
@@ -104,7 +104,7 @@ end
 to-report regret-matching
   let u-true get-utility true
   let u-false get-utility false
-  let u-curr get-utility is-protected
+  let u-curr get-utility protected?
   
   let regret-true max list (u-true - u-curr) 0
   let regret-false max list (u-false - u-curr) 0
