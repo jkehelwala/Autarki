@@ -109,10 +109,10 @@ SLIDER
 133
 Benefit-Per-Unit-Of-Cost
 Benefit-Per-Unit-Of-Cost
-0.5
+1
 10
-1.5
-0.5
+1.2
+0.2
 1
 NIL
 HORIZONTAL
@@ -182,7 +182,7 @@ MONITOR
 115
 485
 Current Round
-current-round-no
+current-round
 17
 1
 11
@@ -193,7 +193,7 @@ MONITOR
 200
 485
 Current Block
-current-block-no
+current-block
 2
 1
 11
@@ -354,6 +354,17 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" ""
+
+MONITOR
+35
+705
+162
+750
+Avg Reputation Limit
+avg-reputation-limit
+3
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

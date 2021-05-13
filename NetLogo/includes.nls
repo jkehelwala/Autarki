@@ -62,6 +62,7 @@ globals [
   current-block-proposer-id
   init?
   total-protection
+  avg-reputation-limit
     
   ;; Calc Related
   no-of-votes-required
@@ -80,7 +81,7 @@ globals [
 
 
 to console-log [logline]
-  output-print(word "LOG - " logline)
+  ;; output-print(word "LOG - " logline)
 end
 
 to export-experiment

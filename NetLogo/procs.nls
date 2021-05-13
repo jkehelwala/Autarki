@@ -22,6 +22,7 @@ to init-globals
   set last-proposed-block ""
   set overall-block 0
   set total-protection 0
+  set avg-reputation-limit 0
   ef-global-init ;; For elfarol
 end
 
@@ -49,17 +50,12 @@ to-report end-simulation
 end
 
 to go
-  if end-simulation [ stop ] ;; Stopping forever button
+  if end-simulation [ 
+    export-experiment
+    stop ;; Stopping forever button
+  ]
   tick
   scheduled-events
-end
-
-to-report current-round-no
-  report current-round
-end
-
-to-report current-block-no
-  report current-block
 end
 
 to-report attack_tolerance_data ;; Possibility of protection being enough for the block to be voted in 
@@ -322,9 +318,9 @@ to update-average-graph
   set-current-plot-pen"Reputation"
   plotxy current-round avg-rep
   if substring Learning-Methodology 0 10 = "Reputation" [
-    let avg-rep-limit (sum [reputation-limit] of peers / No-of-Peers)
+    set avg-reputation-limit (sum [reputation-limit] of peers / No-of-Peers)
     set-current-plot-pen"Reputation Limit"
-    plotxy current-round avg-rep-limit
+    plotxy current-round avg-reputation-limit
   ]
   set-current-plot "Average Utilities"  
   plotxy current-round avg-util
