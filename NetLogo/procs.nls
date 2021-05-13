@@ -102,6 +102,7 @@ to setup-peers
     set effective-availability 0
     set prev-peer-reputation 1
     set peer-reputation 0
+    set reputation-limit 0
     set prev-f 0
 
     set valid-probability False ;; Reputation Maximization    
@@ -151,6 +152,7 @@ to initiate_round
     ask peers [ 
       set prev-peer-reputation peer-reputation
       set-reputation
+      update-average-graph
       set chain [] 
     ]
   ]
@@ -312,3 +314,18 @@ to-report benefit-assignment
   report map [ i -> Benefit-Per-Unit-Of-Cost / i ] n-values No-of-Peers [ random-normal 1.0 Cost-Std-Dev ]  ;; Heterogenous cost
 end
 
+
+to update-average-graph
+  let avg-rep (sum [peer-reputation] of peers / No-of-Peers)
+  let avg-util ( sum [get-utility protected?] of peers / No-of-Peers )
+  set-current-plot "Average Reputations"  
+  set-current-plot-pen"Reputation"
+  plotxy current-round avg-rep
+  if substring Learning-Methodology 0 10 = "Reputation" [
+    let avg-rep-limit (sum [reputation-limit] of peers / No-of-Peers)
+    set-current-plot-pen"Reputation Limit"
+    plotxy current-round avg-rep-limit
+  ]
+  set-current-plot "Average Utilities"  
+  plotxy current-round avg-util
+end

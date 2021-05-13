@@ -109,10 +109,10 @@ SLIDER
 133
 Benefit-Per-Unit-Of-Cost
 Benefit-Per-Unit-Of-Cost
-1
+0.5
 10
-3.0
-1
+1.5
+0.5
 1
 NIL
 HORIZONTAL
@@ -236,7 +236,7 @@ SLIDER
 Min-Attack-Probability
 Min-Attack-Probability
 0
-1
+0.99
 0.1
 0.01
 1
@@ -317,6 +317,43 @@ false
 PENS
 "Invested" 1.0 0 -5298144 true "" ""
 "Required" 1.0 0 -7500403 true "" ";; plot a threshold line\nplot-pen-reset\nplotxy 0 Votes-Required\nplotxy plot-x-max Votes-Required"
+
+PLOT
+35
+515
+455
+705
+Average Reputations
+Round
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"Reputation" 1.0 0 -16777216 true "" ""
+"Reputation Limit" 1.0 0 -5298144 true "" ""
+
+PLOT
+505
+515
+910
+705
+Average Utilities
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" ""
 
 @#$#@#$#@
 ## WHAT IS IT?

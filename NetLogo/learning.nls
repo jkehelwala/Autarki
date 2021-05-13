@@ -49,9 +49,9 @@ to-report reputation-maximization ;; Without prev-f
     console-log("func(reputation-maximization) - Invalid divisor. Defaulting to random.")
     report random-protection 
   ]
-  let reputation_limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8
-  let investment peer-reputation < reputation_limit
-  console-test(word "func(reputation-maximization) - Round " current-round " Divisor: " limit-divisor " Limit: " reputation_limit " Reputation " peer-reputation " Investment " investment) 
+  set reputation-limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8
+  let investment peer-reputation < reputation-limit
+  ;; console-log(word "TEST func(reputation-maximization) - Round " current-round " Divisor: " limit-divisor " Limit: " reputation-limit " Reputation " peer-reputation " Investment " investment) 
   report investment
 end
 
@@ -64,9 +64,9 @@ to-report reputation-maximization-alt ;; With prev-f
     console-log("func(reputation-maximization) - Invalid divisor. Defaulting to random.")
     report random-protection 
   ]
-  let reputation_limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8
-  let investment peer-reputation < reputation_limit
-  console-test(word "func(reputation-maximization) - Round " current-round " Divisor: " limit-divisor " Limit: " reputation_limit " Reputation " peer-reputation " Investment " investment) 
+  set reputation-limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8
+  let investment peer-reputation < reputation-limit
+  ;; console-log(word "TEST func(reputation-maximization) - Round " current-round " Divisor: " limit-divisor " Limit: " reputation-limit " Reputation " peer-reputation " Investment " investment) 
   report investment
 end
 
@@ -85,7 +85,7 @@ to set-reputation
   set valid-probability (fbr >= 1)
   set mixed-strategy-prob 0
   if valid-probability [ set mixed-strategy-prob ( 1 / ( 2 - (1 / fbr ) ) ) ]
-  console-test(word "func(rm-set-reputation) >> Round " current-round " fbr: " fbr " prev_f: "  prev-f " rep: " peer-reputation " b: " benefit-puoc " validity: " valid-probability " prob: " mixed-strategy-prob)  
+  ;; console-log(word "TEST func(rm-set-reputation) >> Round " current-round " fbr: " fbr " prev_f: "  prev-f " rep: " peer-reputation " b: " benefit-puoc " validity: " valid-probability " prob: " mixed-strategy-prob)  
 end
 
 ;; Regret Matching

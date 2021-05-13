@@ -38,6 +38,7 @@ peers-own [
   ;; Reputation Maximization based parameters
   valid-probability
   mixed-strategy-prob
+  reputation-limit
   
   ;; Regret with history
   regrets
@@ -80,10 +81,6 @@ globals [
 
 to console-log [logline]
   output-print(word "LOG - " logline)
-end
-
-to console-test [logline]
-  print(word "TST - " logline)
 end
 
 to export-experiment
