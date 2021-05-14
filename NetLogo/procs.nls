@@ -51,7 +51,7 @@ end
 
 to go
   if end-simulation [ 
-    export-experiment
+    ;; export-experiment
     stop ;; Stopping forever button
   ]
   tick
