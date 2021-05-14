@@ -82,17 +82,27 @@ to console-log [logline]
   ;; output-print(word "LOG - " logline)
 end
 
+to export-env-var [fileloc]
+  file-open fileloc
+  let sec1 (word  No-of-Peers "," Votes-Required "," Block-Timeout "," Benefit-Per-Unit-Of-Cost "," Heterogeneous-Cost "," Cost-Std-Dev "," Min-Attack-Probability "," Learning-Methodology "," Rounds ",")
+  let sec2 (word Min-Con-Delay "," Max-Con-Delay "," Min-Peer-Cons "," Max-Peer-Cons)
+  file-print "No-of-Peers,Votes-Required,Block-Timeout,Benefit-Per-Unit-Of-Cost,Heterogeneous-Cost,Cost-Std-Dev,Min-Attack-Probability,Learning-Methodology,Rounds,Min-Con-Delay,Max-Con-Delay,Min-Peer-Cons,Max-Peer-Cons"
+  file-print (word sec1 sec2) 
+  file-close
+end
+
 to export-experiment
   let ts date-and-time
   let fsuffix (word  (substring ts 16 18) "_" (substring ts 0 2) "_" (substring ts 3 5) "_" (substring ts 6 8) "_" (substring ts 9 12) "_" (substring ts 13 16) ) 
   let exp_name (word behaviorspace-run-number "_" behaviorspace-experiment-name "_" fsuffix)
   export-interface (word "output/img_" exp_name ".png")
+  export-env-var (word "output/img_env_" exp_name ".csv")
   export-plot "Block Acceptance" (word "output/tbl_ba_" exp_name ".csv")
   export-plot "Total Protection" (word "output/tbl_tp_" exp_name ".csv")
   export-plot "Average Reputations" (word "output/tbl_rep_" exp_name ".csv")
   export-plot "Average Utilities" (word "output/tbl_util_" exp_name ".csv")
   ;; export-all-plots (word "output/plots_" exp_name ".csv")
   output-print(word "Completed: " exp_name)
-  repeat 3 [ beep wait 0.1 ]
+  ;; repeat 3 [ beep wait 0.1 ]
 end
 
