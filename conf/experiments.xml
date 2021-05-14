@@ -453,6 +453,8 @@
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Attack-Probability">
       <value value="0"/>
+      <value value="0.5"/>
+      <value value="0.9"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="No-of-Peers">
       <value value="100"/>
@@ -462,236 +464,236 @@
     </enumeratedValueSet>
   </experiment>
   <experiment name="4.0.rep_max_r20" repetitions="1" runMetricsEveryStep="false">
-     <setup>setup</setup>
-     <go>go</go>
-     <final>export-experiment</final>
-     <exitCondition>end-simulation</exitCondition>
-     <enumeratedValueSet variable="Votes-Required">
-       <value value="50.1"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Block-Timeout">
-       <value value="25"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
-       <value value="3"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Heterogeneous-Cost">
-       <value value="false"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Rounds">
-       <value value="20"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Learning-Methodology">
-       <value value="&quot;Reputation Maximization&quot;"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Con-Delay">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Con-Delay">
-       <value value="9"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Peer-Cons">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Peer-Cons">
-       <value value="6"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Attack-Probability">
-       <value value="0"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="No-of-Peers">
-       <value value="100"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Cost-Std-Dev">
-       <value value="0.025"/>
-     </enumeratedValueSet>
-   </experiment>
-   <experiment name="4.1.regret_r" repetitions="1" runMetricsEveryStep="false">
-     <setup>setup</setup>
-     <go>go</go>
-     <final>export-experiment</final>
-     <exitCondition>end-simulation</exitCondition>
-     <enumeratedValueSet variable="Votes-Required">
-       <value value="50.1"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Block-Timeout">
-       <value value="25"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
-       <value value="3"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Heterogeneous-Cost">
-       <value value="false"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Rounds">
-       <value value="10"/>
-       <value value="20"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Learning-Methodology">
-       <value value="&quot;Regret Matching&quot;"/>
-       <value value="&quot;Regret Matching (with History)&quot;"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Con-Delay">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Con-Delay">
-       <value value="9"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Peer-Cons">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Peer-Cons">
-       <value value="6"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Attack-Probability">
-       <value value="0"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="No-of-Peers">
-       <value value="100"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Cost-Std-Dev">
-       <value value="0.025"/>
-     </enumeratedValueSet>
-   </experiment>
-   <experiment name="4.2.regret_benefit" repetitions="1" runMetricsEveryStep="false">
-     <setup>setup</setup>
-     <go>go</go>
-     <final>export-experiment</final>
-     <exitCondition>end-simulation</exitCondition>
-     <enumeratedValueSet variable="Votes-Required">
-       <value value="50.1"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Block-Timeout">
-       <value value="25"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
-       <value value="1.5"/>
-       <value value="3"/>
-       <value value="4"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Heterogeneous-Cost">
-       <value value="false"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Rounds">
-       <value value="20"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Learning-Methodology">
-       <value value="&quot;Regret Matching&quot;"/>
-       <value value="&quot;Regret Matching (with History)&quot;"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Con-Delay">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Con-Delay">
-       <value value="9"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Peer-Cons">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Peer-Cons">
-       <value value="6"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Attack-Probability">
-       <value value="0"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="No-of-Peers">
-       <value value="100"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Cost-Std-Dev">
-       <value value="0.025"/>
-     </enumeratedValueSet>
-   </experiment>
-   <experiment name="4.3.boundedr_r" repetitions="1" runMetricsEveryStep="false">
-     <setup>setup</setup>
-     <go>go</go>
-     <final>export-experiment</final>
-     <exitCondition>end-simulation</exitCondition>
-     <enumeratedValueSet variable="Votes-Required">
-       <value value="50.1"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Block-Timeout">
-       <value value="25"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
-       <value value="3"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Heterogeneous-Cost">
-       <value value="false"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Rounds">
-       <value value="10"/>
-       <value value="20"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Learning-Methodology">
-       <value value="&quot;Bounded Rationality&quot;"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Con-Delay">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Con-Delay">
-       <value value="9"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Peer-Cons">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Peer-Cons">
-       <value value="6"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Attack-Probability">
-       <value value="0"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="No-of-Peers">
-       <value value="100"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Cost-Std-Dev">
-       <value value="0.025"/>
-     </enumeratedValueSet>
-   </experiment>
-   <experiment name="4.4.boundedr_benefit" repetitions="1" runMetricsEveryStep="false">
-     <setup>setup</setup>
-     <go>go</go>
-     <final>export-experiment</final>
-     <exitCondition>end-simulation</exitCondition>
-     <enumeratedValueSet variable="Votes-Required">
-       <value value="50.1"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Block-Timeout">
-       <value value="25"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
-       <value value="1.5"/>
-       <value value="3"/>
-       <value value="4"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Heterogeneous-Cost">
-       <value value="false"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Rounds">
-       <value value="20"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Learning-Methodology">
-       <value value="&quot;Bounded Rationality&quot;"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Con-Delay">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Con-Delay">
-       <value value="9"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Peer-Cons">
-       <value value="2"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Max-Peer-Cons">
-       <value value="6"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Min-Attack-Probability">
-       <value value="0"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="No-of-Peers">
-       <value value="100"/>
-     </enumeratedValueSet>
-     <enumeratedValueSet variable="Cost-Std-Dev">
-       <value value="0.025"/>
-     </enumeratedValueSet>
-   </experiment>
+    <setup>setup</setup>
+    <go>go</go>
+    <final>export-experiment</final>
+    <exitCondition>end-simulation</exitCondition>
+    <enumeratedValueSet variable="Votes-Required">
+      <value value="50.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Block-Timeout">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Heterogeneous-Cost">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Rounds">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Learning-Methodology">
+      <value value="&quot;Reputation Maximization&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Con-Delay">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Con-Delay">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Peer-Cons">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Peer-Cons">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Attack-Probability">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="No-of-Peers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Cost-Std-Dev">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="4.1.regret_r" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <final>export-experiment</final>
+    <exitCondition>end-simulation</exitCondition>
+    <enumeratedValueSet variable="Votes-Required">
+      <value value="50.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Block-Timeout">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Heterogeneous-Cost">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Rounds">
+      <value value="10"/>
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Learning-Methodology">
+      <value value="&quot;Regret Matching&quot;"/>
+      <value value="&quot;Regret Matching (with History)&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Con-Delay">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Con-Delay">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Peer-Cons">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Peer-Cons">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Attack-Probability">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="No-of-Peers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Cost-Std-Dev">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="4.2.regret_benefit" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <final>export-experiment</final>
+    <exitCondition>end-simulation</exitCondition>
+    <enumeratedValueSet variable="Votes-Required">
+      <value value="50.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Block-Timeout">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
+      <value value="1.5"/>
+      <value value="3"/>
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Heterogeneous-Cost">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Rounds">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Learning-Methodology">
+      <value value="&quot;Regret Matching&quot;"/>
+      <value value="&quot;Regret Matching (with History)&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Con-Delay">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Con-Delay">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Peer-Cons">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Peer-Cons">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Attack-Probability">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="No-of-Peers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Cost-Std-Dev">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="4.3.boundedr_r" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <final>export-experiment</final>
+    <exitCondition>end-simulation</exitCondition>
+    <enumeratedValueSet variable="Votes-Required">
+      <value value="50.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Block-Timeout">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Heterogeneous-Cost">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Rounds">
+      <value value="10"/>
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Learning-Methodology">
+      <value value="&quot;Bounded Rationality&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Con-Delay">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Con-Delay">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Peer-Cons">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Peer-Cons">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Attack-Probability">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="No-of-Peers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Cost-Std-Dev">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="4.4.boundedr_benefit" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <final>export-experiment</final>
+    <exitCondition>end-simulation</exitCondition>
+    <enumeratedValueSet variable="Votes-Required">
+      <value value="50.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Block-Timeout">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
+      <value value="1.5"/>
+      <value value="3"/>
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Heterogeneous-Cost">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Rounds">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Learning-Methodology">
+      <value value="&quot;Bounded Rationality&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Con-Delay">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Con-Delay">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Peer-Cons">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Peer-Cons">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Attack-Probability">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="No-of-Peers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Cost-Std-Dev">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+  </experiment>
 </experiments>
