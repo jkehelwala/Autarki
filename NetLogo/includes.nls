@@ -95,7 +95,7 @@ to export-experiment
   ;; let ts date-and-time
   ;; let fsuffix (word  (substring ts 16 18) "_" (substring ts 0 2) "_" (substring ts 3 5) "_" (substring ts 6 8) "_" (substring ts 9 12) "_" (substring ts 13 16) ) 
   let exp_name (word "R1_" behaviorspace-experiment-name "_" behaviorspace-run-number "_" )
-  if file-exists? (word "output/" exp_name "_env.csv") [
+  if file-exists? (word "output/" exp_name "env.csv") [
     set exp_name (word "R2_" behaviorspace-experiment-name "_" behaviorspace-run-number "_" )
   ]
   export-env-var (word "output/" exp_name "env.csv")
