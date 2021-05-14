@@ -41,7 +41,7 @@ to scheduled-events
   if init? [stop]
   if ticks mod Block-Timeout = 0 [ initiate_block ]
   ask peers [
-    if ticks mod con-strength = 0 [ push-peer-block ]
+    if ticks mod con-delay = 0 [ push-peer-block ]
   ]
 end
 
@@ -59,8 +59,8 @@ to go
 end
 
 to-report attack_tolerance_data ;; Possibility of protection being enough for the block to be voted in 
-  ;; report (No-of-Peers - no-of-votes-required ) >= count peers with [is-down]
-  report (word count peers with [is-down] "/" (No-of-Peers - no-of-votes-required ) )
+  report (No-of-Peers - no-of-votes-required ) >= count peers with [is-down]
+  ;; report (word count peers with [is-down] "/" (No-of-Peers - no-of-votes-required ) )
 end
 
 to setup-peers
@@ -92,7 +92,7 @@ to setup-peers
     set roundchain []
     set protected? False
     set is-down False
-    set con-strength Min-Con-Strength +  random (Max-Con-Strength - Min-Con-Strength)
+    set con-delay Min-Con-Delay +  random (Max-Con-Delay - Min-Con-Delay)
     set allowed-link-no Min-Peer-Cons + random (Max-Peer-Cons - Min-Peer-Cons)
     
     set effective-availability 0
@@ -110,13 +110,13 @@ to setup-peers
   ask bserver [
     create-server-cons-to other peers [
       set color blue - subdue-color
-      set delay [con-strength] of other-end
+      ;; set delay [con-delay] of other-end
     ]
     ;; ask my-out-server-cons []
   ]
   ask battacker [
     create-attacker-cons-to other peers [
-      set delay [con-strength] of other-end
+      ;; set delay [con-strength] of other-end
       set color orange - subdue-color
     ]
   ]
@@ -127,8 +127,7 @@ to setup-peers
     ]
     ask peer-cons [
       set color turquoise
-      set delay min(list [con-strength] of end1 [con-strength] of end2)
-      ;; set thickness delay /(last const-con-strength * 10) ;; TODO: Uncomment for visual confirmation
+      ;; set delay min(list [con-strength] of end1 [con-strength] of end2)
     ]
   ]
 end

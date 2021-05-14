@@ -9,8 +9,6 @@ breed [attackers attacker]
 directed-link-breed [server-cons server-con]
 directed-link-breed [attacker-cons attacker-con]
 undirected-link-breed [peer-cons peer-con]
-links-own [delay]
-
 
 attackers-own[
   blocks-to-attack
@@ -18,7 +16,7 @@ attackers-own[
 
 peers-own [
   peer-id 
-  con-strength 
+  con-delay 
   allowed-link-no 
   protected?
   is-down 
@@ -91,6 +89,8 @@ to export-experiment
   export-interface (word "output/img_" exp_name ".png")
   export-plot "Block Acceptance" (word "output/tbl_ba_" exp_name ".csv")
   export-plot "Total Protection" (word "output/tbl_tp_" exp_name ".csv")
+  export-plot "Average Reputations" (word "output/tbl_rep_" exp_name ".csv")
+  export-plot "Average Utilities" (word "output/tbl_util_" exp_name ".csv")
   ;; export-all-plots (word "output/plots_" exp_name ".csv")
   output-print(word "Completed: " exp_name)
   repeat 3 [ beep wait 0.1 ]
