@@ -1,7 +1,7 @@
 to ef-global-init
-  set ef-memory-size 4
+  set ef-memory-size 10
   set ef-history n-values (ef-memory-size * 2) [random 100]
-  set ef-number-strategies 4
+  set ef-number-strategies 100
 end
 
 to ef-init
