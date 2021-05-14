@@ -237,7 +237,7 @@ Min-Attack-Probability
 Min-Attack-Probability
 0
 0.99
-0.1
+0.0
 0.01
 1
 NIL
