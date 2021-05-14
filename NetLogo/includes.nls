@@ -100,10 +100,10 @@ to export-experiment
   ]
   export-env-var (word "output/" exp_name "env.csv")
   export-interface (word "output/" exp_name "img.png")
-  export-plot "Block Acceptance" (word "output/" exp_name "tbl_ba.csv")
-  export-plot "Total Protection" (word "output/" exp_name "tbl_tp.csv")
-  export-plot "Average Reputations" (word "output/" exp_name "tbl_rep.csv")
-  export-plot "Average Utilities" (word "output/" exp_name "tbl_util.csv")
+  export-plot "Block Acceptance" (word "output/tbl_" exp_name "ba.csv")
+  export-plot "Total Protection" (word "output/tbl_" exp_name "tp.csv")
+  export-plot "Average Reputations" (word "output/tbl_" exp_name "rep.csv")
+  export-plot "Average Utilities" (word "output/tbl_" exp_name "util.csv")
   ;; export-all-plots (word "output/plots_" exp_name ".csv")
   output-print(word "Completed: " exp_name)
   ;; repeat 3 [ beep wait 0.1 ]
