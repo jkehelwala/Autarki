@@ -78,12 +78,16 @@ to set-reputation
   set effective-availability 0
   if no-of-accepted-blocks > 1 [ set effective-availability (counted-votes / no-of-accepted-blocks ) ]
   set prev-f (length list-of-voter-lists / No-of-Peers )
-  let divisor (total-protection + (1 / prev-f) * ( No-of-Peers - total-protection) * ( 1 - current-round-mu))
   set peer-reputation 0
+  set mixed-strategy-prob 0
+  if prev-f = 0 [ 
+    set valid-probability false
+    stop 
+  ]
+  let divisor (total-protection + (1 / prev-f) * ( No-of-Peers - total-protection) * ( 1 - current-round-mu))
   if divisor > 0 [ set peer-reputation ( (No-of-Peers * effective-availability) / divisor ) ]
   let fbr (peer-reputation * prev-f * benefit-puoc)
   set valid-probability (fbr >= 1)
-  set mixed-strategy-prob 0
   if valid-probability [ set mixed-strategy-prob ( 1 / ( 2 - (1 / fbr ) ) ) ]
   ;; console-log(word "TEST func(rm-set-reputation) >> Round " current-round " fbr: " fbr " prev_f: "  prev-f " rep: " peer-reputation " b: " benefit-puoc " validity: " valid-probability " prob: " mixed-strategy-prob)  
 end
