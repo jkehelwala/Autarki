@@ -26,7 +26,7 @@ to set_run
   py:set "is_cost_heterogeneous" Heterogeneous-Cost
   py:set "benefit_per_unit_of_cost" Benefit-Per-Unit-Of-Cost
   py:set "minimum_attack_probability" Min-Attack-Probability
-  py:set "desc_data" (list Duration Min-Con-Strength Max-Con-Strength Min-Peer-Cons Max-Peer-Cons)
+  py:set "desc_data" (list Duration Min-Con-Delay Max-Con-Delay Min-Peer-Cons Max-Peer-Cons)
   py:run "pyagent.init_run(run_no, run_name, total_peers, required_votes, learning_strategy, is_cost_heterogeneous, benefit_per_unit_of_cost, minimum_attack_probability, desc_data)"
 end
 
@@ -86,7 +86,7 @@ to setup_peers
     set transactions "{}"
     set block "{}"
     set is-down False
-    set con-strength Min-Con-Strength +  random (Max-Con-Strength - Min-Con-Strength)
+    set con-strength Min-Con-Delay +  random (Max-Con-Delay - Min-Con-Delay)
     set allowed-link-no Min-Peer-Cons + random (Max-Peer-Cons - Min-Peer-Cons)
     py:set "x" who ;; TONOTE: This is for record keeping/signature. Peers will not be addressed through this.
     set peer-id (py:runresult "pyagent.create_peer(run_no, x)")

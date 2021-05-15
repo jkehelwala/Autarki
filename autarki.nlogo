@@ -203,10 +203,10 @@ SLIDER
 130
 585
 163
-Min-Con-Strength
-Min-Con-Strength
+Min-Con-Delay
+Min-Con-Delay
 1
-Max-Con-Strength
+Max-Con-Delay
 1.0
 1
 1
@@ -218,9 +218,9 @@ SLIDER
 170
 585
 203
-Max-Con-Strength
-Max-Con-Strength
-Min-Con-Strength
+Max-Con-Delay
+Max-Con-Delay
+Min-Con-Delay
 10
 5.0
 1
