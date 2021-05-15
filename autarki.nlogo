@@ -1279,7 +1279,6 @@ NetLogo 6.2.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Rounds">
-      <value value="10"/>
       <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
@@ -1376,6 +1375,7 @@ NetLogo 6.2.0
     <enumeratedValueSet variable="Rounds">
       <value value="10"/>
       <value value="20"/>
+      <value value="40"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
       <value value="&quot;Bounded Rationality&quot;"/>
