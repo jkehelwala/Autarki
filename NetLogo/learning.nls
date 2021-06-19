@@ -6,10 +6,10 @@ to-report get-protection
     Learning-Methodology = "Mixed Strategy" [
       report mixed-strategy-protection
     ]
-    Learning-Methodology = "Reputation Maximization" [
+    Learning-Methodology = "Reputation Optimization" [
       report reputation-maximization
     ]
-    Learning-Methodology = "Reputation Maximization (with f)" [
+    Learning-Methodology = "Reputation Optimization (with f)" [
       report reputation-maximization-alt
     ]
     Learning-Methodology = "Regret Matching" [

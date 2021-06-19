@@ -124,8 +124,8 @@ CHOOSER
 100
 Learning-Methodology
 Learning-Methodology
-"Random" "> Required" "Mixed Strategy" "Reputation Maximization" "Reputation Maximization (with f)" "Regret Matching" "Regret Matching (with History)" "Bounded Rationality"
-3
+"Random" "> Required" "Mixed Strategy" "Reputation Optimization" "Reputation Optimization (with f)" "Regret Matching" "Regret Matching (with History)" "Bounded Rationality"
+0
 
 SLIDER
 220
@@ -775,7 +775,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -822,7 +822,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -867,7 +867,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -917,7 +917,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -962,7 +962,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -1008,7 +1008,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -1053,7 +1053,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -1100,7 +1100,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -1145,7 +1145,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -1190,7 +1190,7 @@ NetLogo 6.2.0
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
@@ -1237,7 +1237,7 @@ NetLogo 6.2.0
       <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
-      <value value="&quot;Reputation Maximization&quot;"/>
+      <value value="&quot;Reputation Optimization&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>

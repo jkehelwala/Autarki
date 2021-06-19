@@ -101,7 +101,7 @@ to setup-peers
     set reputation-limit 0
     set prev-f 0
 
-    set valid-probability False ;; Reputation Maximization    
+    set valid-probability False ;; Reputation Optimization
     set regrets [] ;; Regret Matching  
     ef-init ;; El Farol
     

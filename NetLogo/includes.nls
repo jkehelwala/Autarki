@@ -33,7 +33,7 @@ peers-own [
   peer-reputation
   
   
-  ;; Reputation Maximization based parameters
+  ;; Reputation Optimization based parameters
   valid-probability
   mixed-strategy-prob
   reputation-limit
