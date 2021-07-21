@@ -160,8 +160,8 @@ HORIZONTAL
 PLOT
 30
 270
-460
-440
+385
+430
 Block Acceptance
 Block
 Votes
@@ -178,9 +178,9 @@ PENS
 
 MONITOR
 30
-440
+430
 115
-485
+475
 Current Round
 current-round
 17
@@ -189,9 +189,9 @@ current-round
 
 MONITOR
 115
-440
+430
 200
-485
+475
 Current Block
 current-block
 2
@@ -274,10 +274,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-340
-440
-457
-485
+265
+430
+382
+475
 Tolerant to attack
 attack_tolerance_data
 17
@@ -300,10 +300,10 @@ NIL
 HORIZONTAL
 
 PLOT
-505
+405
 270
-910
-440
+760
+430
 Total Protection
 Round
 NIL
@@ -320,9 +320,9 @@ PENS
 
 PLOT
 35
-515
-455
-705
+510
+390
+670
 Average Reputations
 Round
 NIL
@@ -338,10 +338,10 @@ PENS
 "Reputation Limit" 1.0 0 -5298144 true "" ""
 
 PLOT
-505
-515
-910
-705
+785
+270
+1140
+430
 Average Utilities
 NIL
 NIL
@@ -357,14 +357,33 @@ PENS
 
 MONITOR
 35
-705
+670
 162
-750
+715
 Avg Reputation Limit
 avg-reputation-limit
 3
 1
 11
+
+PLOT
+400
+510
+755
+670
+Validity Count
+NIL
+NIL
+0.0
+10.0
+1.0
+10.0
+true
+false
+"" ""
+PENS
+"Validity" 1.0 0 -5298144 true "" ""
+"Required" 1.0 0 -7500403 true "" ";; plot a threshold line\nplot-pen-reset\nplotxy 0 Votes-Required\nplotxy plot-x-max Votes-Required"
 
 @#$#@#$#@
 ## WHAT IS IT?

@@ -102,6 +102,7 @@ to export-experiment
   export-interface (word "output/" exp_name "img.png")
   export-plot "Block Acceptance" (word "output/tbl_" exp_name "ba.csv")
   export-plot "Total Protection" (word "output/tbl_" exp_name "tp.csv")
+  export-plot "Validity Count" (word "output/tbl_" exp_name "vc.csv")
   export-plot "Average Reputations" (word "output/tbl_" exp_name "rep.csv")
   export-plot "Average Utilities" (word "output/tbl_" exp_name "util.csv")
   ;; export-all-plots (word "output/plots_" exp_name ".csv")

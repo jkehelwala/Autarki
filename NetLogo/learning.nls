@@ -7,10 +7,10 @@ to-report get-protection
       report mixed-strategy-protection
     ]
     Learning-Methodology = "Reputation Optimization" [
-      report reputation-maximization
+      report reputation-optimization
     ]
     Learning-Methodology = "Reputation Optimization (with f)" [
-      report reputation-maximization-alt
+      report reputation-optimization-alt
     ]
     Learning-Methodology = "Regret Matching" [
       report regret-matching
@@ -41,12 +41,12 @@ to-report mixed-strategy-protection ;; peer method
   report weighted-decision weights 
 end
 
-to-report reputation-maximization ;; Without prev-f 
+to-report reputation-optimization ;; Without prev-f 
   if not valid-probability [ report random-protection ] ;; To ensure f = 1 (strategy assumption)
   let tolerance (1 - ( Votes-Required / 100 ))
   let limit-divisor (benefit-puoc * (1 - (2 * tolerance))) ;; TODO with prev-f or without??? 
   if limit-divisor <= 0 [ 
-    console-log("func(reputation-maximization) - Invalid divisor. Defaulting to random.")
+    console-log("func(reputation-optimization) - Invalid divisor. Defaulting to random.")
     report random-protection 
   ]
   set reputation-limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8
@@ -56,12 +56,12 @@ to-report reputation-maximization ;; Without prev-f
 end
 
 
-to-report reputation-maximization-alt ;; With prev-f 
+to-report reputation-optimization-alt ;; With prev-f 
   if not valid-probability [ report random-protection ] 
   let tolerance (1 - ( Votes-Required / 100 ))
   let limit-divisor (prev-f * benefit-puoc * (1 - (2 * tolerance))) ;; TODO with prev-f or without??? 
   if limit-divisor <= 0 [ 
-    console-log("func(reputation-maximization) - Invalid divisor. Defaulting to random.")
+    console-log("func(reputation-optimization-alt) - Invalid divisor. Defaulting to random.")
     report random-protection 
   ]
   set reputation-limit ( (1 - tolerance ) / limit-divisor)  ;; Inequality 3.8

@@ -16,6 +16,9 @@ to set-plots
   set-current-plot "Total Protection"  
   set-plot-x-range 0 Rounds
   set-plot-y-range 0 100
+  set-current-plot "Validity Count"  
+  set-plot-x-range 0 Rounds
+  set-plot-y-range 0 100
 end
 
 to init-globals
@@ -162,6 +165,15 @@ to set-total-protection
   set total-protection count peers with [protected?] ;; This value could change depending on Block-Timeout based vote exclusions
   set-current-plot "Total Protection"  
   plotxy current-round ( ( total-protection / No-of-Peers ) * 100 )
+  set-reputation-validity-plot
+end
+
+to set-reputation-validity-plot
+  if substring Learning-Methodology 0 10 = "Reputation" [
+    set-current-plot "Validity Count"  
+    let valcount count peers with [valid-probability]
+    plotxy current-round ( ( valcount / No-of-Peers ) * 100 )
+  ]
 end
 
 to plot-vote-precentage
