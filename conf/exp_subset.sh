@@ -1,5 +1,8 @@
+#!/bin/bash
+
 # netlogo-headless.sh --model autarki.nlogo --setup-file file.xml --experiment experiment1
 # Base is same as 1.1.benefits (B=3)
+
 echo "Starting Script"
 ../NetLogo/netlogo-headless.sh --model autarki.nlogo --setup-file conf/exp_subset.xml --experiment 1.1.benefits
 ../NetLogo/netlogo-headless.sh --model autarki.nlogo --setup-file conf/exp_subset.xml --experiment 1.2.min_attack
