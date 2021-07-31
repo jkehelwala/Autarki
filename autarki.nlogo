@@ -773,7 +773,7 @@ NetLogo 6.2.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="base" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="base_rep_op" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <final>export-experiment</final>
@@ -795,6 +795,51 @@ NetLogo 6.2.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
       <value value="&quot;Reputation Optimization&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Con-Delay">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Con-Delay">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Peer-Cons">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-Peer-Cons">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Min-Attack-Probability">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="No-of-Peers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Cost-Std-Dev">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="0.0.base_random" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <final>export-experiment</final>
+    <exitCondition>end-simulation</exitCondition>
+    <enumeratedValueSet variable="Votes-Required">
+      <value value="50.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Block-Timeout">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Benefit-Per-Unit-Of-Cost">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Heterogeneous-Cost">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Rounds">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Learning-Methodology">
+      <value value="&quot;Random&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Min-Con-Delay">
       <value value="2"/>
