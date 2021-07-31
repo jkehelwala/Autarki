@@ -1,9 +1,12 @@
 #!/bin/bash
 
+# nohup sh conf/exp_superset.sh > superset.log &
 # netlogo-headless.sh --model autarki.nlogo --setup-file file.xml --experiment experiment1
 # Base is same as 1.1.benefits (B=3)
 
 echo "Starting Script\n"
+../NetLogo/netlogo-headless.sh --model autarki.nlogo --setup-file conf/exp_superset.xml --experiment 0.0.base_random
+echo "Completed: 0.0.base_random"
 ../NetLogo/netlogo-headless.sh --model autarki.nlogo --setup-file conf/exp_superset.xml --experiment 1.1.benefits
 echo "Completed: 1.1.benefits"
 ../NetLogo/netlogo-headless.sh --model autarki.nlogo --setup-file conf/exp_superset.xml --experiment 1.2.min_attack
