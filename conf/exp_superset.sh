@@ -13,7 +13,7 @@ echo "Completed: 1.1.benefits"
 echo "Completed: 1.2.min_attack"
 ../NetLogo/netlogo-headless.sh --model autarki.nlogo --setup-file conf/exp_superset.xml --experiment 1.3.timeout
 echo "Completed: 1.3.timeout"
-../NetLogo/netlogo-headless.sh --model autarki.nlogo --setup-file conf/exp_superset.xml --experiment 1.4.no_of_peers
+../NetLogo/netlogo-headless.sh --model autarki.nlogo --threads 1 --setup-file conf/exp_superset.xml --experiment 1.4.no_of_peers
 echo "Completed: 1.4.no_of_peers"
 ../NetLogo/netlogo-headless.sh --model autarki.nlogo --setup-file conf/exp_superset.xml --experiment 2.1.costs
 echo "Completed: 2.1.costs"
