@@ -70,7 +70,7 @@ No-of-Peers
 No-of-Peers
 0
 200
-100.0
+20.0
 5
 1
 NIL
@@ -111,7 +111,7 @@ Benefit-Per-Unit-Of-Cost
 Benefit-Per-Unit-Of-Cost
 1
 10
-3.0
+2.0
 0.2
 1
 NIL
@@ -125,7 +125,7 @@ CHOOSER
 Learning-Methodology
 Learning-Methodology
 "Random" "> Required" "Mixed Strategy" "Reputation Optimization" "Reputation Optimization (with f)" "Regret Matching" "Regret Matching (with History)" "Bounded Rationality"
-0
+3
 
 SLIDER
 220
@@ -237,7 +237,7 @@ Min-Attack-Probability
 Min-Attack-Probability
 0
 0.99
-0.0
+0.3
 0.01
 1
 NIL
@@ -388,39 +388,125 @@ PENS
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+This model was designed to study the behavior of rational players in distributed consensus, which in turn translates to the security and reliability of the entire system.
+
+It simulates a voting-based consensus protocol for Blockchain applications that require **completeness** assurance. This is the property of all authentic and valid blocks presented for consensus being accepted and included in the distributed-ledger in their correct chronological order.
+
+The model allows users to observe how a rational peer's decision for self-protection investment would differ when various parameters that concern them are altered.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+The model emulates a Blockchain application. It is designed as an infinitely repeated game which is repeated in sets of `n` block proposals. `n` is the same as the number of peers participating in the consensus. `r` is a parameter that indicates the number of rounds the game is repeated for the simulation. (Note that to emulate the infinitely repeated game, `r` should be assigned a high value.)
+
+From the `n` blocks in a given round, certain blocks of interest are selected by a powerful adversary whose objective is to exclude the blocks from being added to the chain. Considering a selected learning methodology, each peer individually decides on whether to invest in self-protection or not. And if the total protection is higher than the number of votes required, the adversary's attempts are thwarted. Therefore, our model evaluates what learning methodologies are effective and under which conditions. The conditions applicable mostly concerns costs of self-protection, probability of a given proposed block being attacked, benefits given to the peers, and ultimately, the volatility of the network.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+A set of parameters that concerns the peers, their heterogeneity, and the network environment/volatility are provided as variables. Users can alter these variables and observe how it affects peer self-protection investment decision through the below graphs in real-time.
 
-## THINGS TO NOTICE
+### Simulation Output
 
-(suggested things for the user to notice while running the model)
+  * Block Acceptance
+    * How many votes each Block obtained as a percentage
+  * Total Protection
+    * How many peers invested in self-protection
+  * Average Utilities
+  * Average Reputations (Only valid for Reputation Optimization Learning Methodology)
+  * Validity Count (Only valid for Reputation Optimization Learning Methodology)
+    * How many peers satisfied the learning methodology condition before deciding on self-protection investment. This measure validates whether the Learning Methodology was applicable for the given set of parameters or whether the decision was simply random.
 
-## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+### Configurable Parameters
 
-## EXTENDING THE MODEL
+The parameters that could be altered to test different conditions are as follows.
+> It is not recommended to alter parameters during the simulation.
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+  * No-of-Peers
+    * Number of participants in the consensus, `n`. Each round will therefore propose `n` blocks before proceeding to the next round.
+  * Vote-Required
+    * What percentage of votes are required for the Block to be accepted to the chain
+  * Rounds
+    * How many rounds the simulation must continue `r`. Note that  ` r x n ` blocks will be proposed before the simulation is concluded.
+  * Block-Timeout
+    * How many ticks to wait for until the number of votes received is compared against the percentage of votes required
+  * Min-Attack-Probability
+    * The probability that a given number of blocks are attacked during each round. For 10 blocks per round (i.e. *n=10*) and an attack probability of 0.5, 5 randomly selected blocks are attacked for denial of service in each round.
+  * Benefit-Per-Unit-Of-Cost
+    * The constant benefit given to a peer for having voted for a block confirmed into the distributed ledger, divided by the cost of self-protection. The cost of self-protection is homogeneous unless "Heterogeneous-Cost" parameter is turned on.
+  * Learning-Methodology
+    * This option provides various options that the peers could use to decide whether to invest in self-protection or not, given the information that is available to them without any coordination with other users. More information can be found in **Learning Methodologies** section below.
+  * Min-Con-Delay, Max-Con-Delay
+    * Emulates network volatility by randomly assigning a value between the minimum and maximum value for a given peer to wait before propagating the block that was received.
+  * Min-Peer-Cons, Max-Peer-Cons
+    * Emulates peer heterogeneity by assigning a value between the minimum and maximum values for a given peer to limit possible peer-to-peer connections.
+  * Heterogeneous-Cost, Cost-Std-Dev
+    * If Heterogeneous-Cost is turned on, then the peer heterogeneity is increased by allowing peers to have different protection investment costs. Costs are assigned in a normal distribution with the given standard deviation.
 
-## NETLOGO FEATURES
+### Learning Methodologies
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+  * Random
+    * Peers randomly decide whether to invest in self-protection or not
+  * \> Required
+    * (For reference only) A number of peers higher than the required percentage of votes are told to always invest in protection. This tests whether the primary functionality of the simulation is functional.
+  * Mixed Strategy
+    * (Experimental) Given the players are rational, they will invest in protection with some probability. Our research proposes a mixed strategy game-theoretical model which uses the above peer-related parameters to estimate the probability of protection investment. This value is used by peers to decide how many rounds to invest in (Which rounds the investment is made is decided at the start of simulation). Note that peers do not coordinate in this scenario.
+  * Reputation Optimization
+    * Players obtain a Reputation Limit through the mixed strategy game-theoretical model from our research, and if their reputation exceeds this limit, they decide to not invest. A peer with a lesser reputation than the reputation limit decides to invest in protection.
+  * Reputation Optimization (with f)
+    * (Experimental) Similar to Reputation Optimization, but incorporates the `f` value in calculations. `f` value determines how many blocks were accepted from the total proposed number of blocks. This cannot be calculated until the round is over, and therefore cannot be used for decision making. In this learning methodology, the previous round's `f` value is used as a substitution.
+  * Regret Matching
+    * (Experimental)  Players probabilistically choose their action depending on what the total utility for the previous round had been, had they chosen a different action **[2]**.
+  * Regret Matching (with History)
+    * (Experimental) Same as Regret Matching, but the utility of historical plays are considered in decision making.
+  * Bounded Rationality
+    * (Experimental) Emulates the El Farol Bar Game, where a set of random beliefs are assigned which are scored according to their success rates. Higher scoring beliefs survive and are used for decision-making regarding self-investment. **[3]**
+
+> Note that some of the below methodologies are better explained in our research.
+
+## LIMITATIONS
+
+- A simplified implementation of a Blockchain application is implemented to facilitate the continued execution of the simulation. Transaction and block propagation, block verification aspects, are not implemented by the simulation. While these factors introduce the network volatility and therein the level of the noise present, which ultimately affects the learning outcomes and investment probabilities, the accuracy of the simulation is affected. However, studying the effects of such noise could also be induced through lower timeout values, higher ranges of connection delays, and smaller ranges of connections allowed between peers, and therefore this was an acceptable limitation.
+
+- Since the native NetLogo `tick` functionality is used for timeouts, some amount of time allocated to the first block timeout was consumed during round initiation calculations. Therefore in the Block Acceptance graphs, the first block of each round is not accepted by the network due to the remaining amount of time not being sufficient for gossip message/vote propagation. We advise the reader to interpret the results with this in mind and to consult the Total Protection graph in doubt.
+
+- In case all peers were under attack, the simulation was tweaked for one random peer to come online and propose a block irrespective of their protection decision. Considering that this block would never be accepted, the impact of this was negligible.
+
+- Given the single-threaded nature of NetLogo (per singular simulation run) true concurrent timeout at individual peer-level could not be emulated.
+
+- Given the nature of the game-theoretical model proposed, the effects of open participation are not incorporated in our analysis. While this is a limitation of the reputation-based learning based on our round-based infinitely repeated mixed strategy equilibria, considering that our implementation used NetLogo, it should be possible to extend our model to evaluate the effect of peers dropping and joining the network during the simulation execution. The impact of a varying number of peers will be evaluated in future work.
+
+- The incentive for message propagation is implicitly baked into the game-theoretical model proposed by the requirement of peers having up-to-date transactions for block hash verification and subsequent voting purposes. In addition, since it is a known fact that there will be some peers who will not invest in security, reaching everyone available in the interest of obtaining the required number of votes before the timeout is also required. Another aspect that influences this would be the necessity of accurate calculations regarding reputation, benefits, and system-wide availability during learning processes. Our simulation design, however, does not include transactions in its implementation, and thus is disadvantaged in representing the amount of network volatility that would be present in a real network.
+
+- In bounded rationality learning methodology implementation **[3]**, parameters of memory size and the number of strategies for peers were kept constant. A comparison of differing parameters for this methodology alongside the existing parameters of our model was considered out of scope for our evaluation.
+
+
+
+## SOURCE AND UPDATES
+
+The source is included in the below order (for ease of reference and version control)
+
+
+    autarki.nlogo
+     └ NetLogo/includes.nls
+        ├ NetLogo/procs.nls
+        ├ NetLogo/learning.nls
+        └ NetLogo/elfarol.nls ([1])
+
+Updates to this model can be obtained through [the GitHub repository](https://github.com/jkehelwala/Autarki). The repository access will be granted on request. Please refer to the attached MIT License for further details.
 
 ## RELATED MODELS
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+To compare with our original reputation optimization learning methodology performance, code for the El Farol model was adapted as a learning methodology. The related code (`NetLogo/elfarol.nls`) was included from El Farol model in the NetLogo model library as is [1], which can be found in the NetLogo Models Library under Social Science category.
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+**[1]** Rand, W., Wilensky, U. (2007).  NetLogo El Farol model.  http://ccl.northwestern.edu/netlogo/models/ElFarol.  Center for Connected Learning and Computer-Based Modeling, Northwestern Institute on Complex Systems, Northwestern University, Evanston, IL.
+
+**[2]**  Hart, S., & Mas‐Colell, A. (2000). A simple adaptive procedure leading to correlated equilibrium. Econometrica, 68(5), 1127-1150.
+
+**[3]** Arthur, W. B. (1994). Inductive reasoning and bounded rationality. The American economic review, 84(2), 406-411.
+
+
 @#$#@#$#@
 default
 true
