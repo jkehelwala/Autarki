@@ -138,6 +138,8 @@ end
 to initiate_round
   set init? true
   set current-round (current-round + 1)
+  print (date-and-time)
+  print current-round
   if end-simulation [
     console-log("Round number reached. Simulation will stop soon.")
     stop
