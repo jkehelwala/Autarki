@@ -165,6 +165,7 @@ end
 
 to set-total-protection
   set total-protection count peers with [protected?] ;; This value could change depending on Block-Timeout based vote exclusions
+  print total-protection
   set-current-plot "Total Protection"  
   plotxy current-round ( ( total-protection / No-of-Peers ) * 100 )
   set-reputation-validity-plot
