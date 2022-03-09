@@ -3,11 +3,11 @@ __includes [ "NetLogo/includes.nls" ]
 GRAPHICS-WINDOW
 1200
 10
-1884
-695
+1241
+52
 -1
 -1
-20.5
+1.0
 1
 10
 1
@@ -506,7 +506,6 @@ To compare with our original reputation optimization learning methodology perfor
 
 **[3]** Arthur, W. B. (1994). Inductive reasoning and bounded rationality. The American economic review, 84(2), 406-411.
 
-
 @#$#@#$#@
 default
 true
@@ -854,7 +853,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.0
+NetLogo 6.2.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
