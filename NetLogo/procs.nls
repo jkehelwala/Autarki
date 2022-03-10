@@ -6,13 +6,11 @@ to setup
   setup-peers
   reset-ticks ;; start the clock
   set-plots
+  print (word ", Timestamp: " date-and-time) 
   initiate_round
 end
 
 to set-plots
-  set-current-plot "Block Acceptance"
-  set-plot-x-range -1 No-of-Peers
-  set-plot-y-range 0 100
   set-current-plot "Total Protection"  
   set-plot-x-range 0 Rounds
   set-plot-y-range 0 100
@@ -26,7 +24,6 @@ to init-globals
   set overall-block 0
   set total-protection 0
   set avg-reputation-limit 0
-  ef-global-init ;; For elfarol
 end
 
 to set-constants
@@ -92,7 +89,8 @@ to setup-peers
     set block ""
     set block-voters []
     set chain []
-    set roundchain []
+    ;; set roundchain []
+    set lastchain []
     set protected? False
     set is-down False
     set con-delay Min-Con-Delay +  random (Max-Con-Delay - Min-Con-Delay)
@@ -104,11 +102,7 @@ to setup-peers
     set reputation-limit 0
     set prev-f 0
 
-    set valid-probability False ;; Reputation Optimization
-    set regrets [] ;; Regret Matching  
-    ef-init ;; El Farol
-    
-    
+    set valid-probability False ;; Reputation Optimization    
   ]
   ask bserver [
     create-server-cons-to other peers [
@@ -138,8 +132,6 @@ end
 to initiate_round
   set init? true
   set current-round (current-round + 1)
-  print (date-and-time)
-  print current-round
   if end-simulation [
     console-log("Round number reached. Simulation will stop soon.")
     stop
@@ -157,7 +149,6 @@ to initiate_round
     ]
   ]
   ask peers [ set-peer-protection-decision ]  
-  ef-learning-updates ;; For elfarol only
   ask battacker [ set-list-of-blocks-to-attack  ]
   set init? false
   tick-advance (Block-Timeout - (ticks mod Block-Timeout) + 1 )
@@ -165,8 +156,8 @@ end
 
 to set-total-protection
   set total-protection count peers with [protected?] ;; This value could change depending on Block-Timeout based vote exclusions
-  print total-protection
-  set-current-plot "Total Protection"  
+  print (word "Round: " current-round ", Timestamp: " date-and-time ", Total Protection: " total-protection) 
+  set-current-plot "Total Protection" 
   plotxy current-round ( ( total-protection / No-of-Peers ) * 100 )
   set-reputation-validity-plot
 end
@@ -180,9 +171,9 @@ to set-reputation-validity-plot
 end
 
 to plot-vote-precentage
-  let obtained-votes-no count peers with [not empty? chain and first last chain = last-proposed-block] ;; first element (block string) of last item in chain
-  set-current-plot "Block Acceptance"
-  plotxy overall-block ( ( obtained-votes-no / No-of-Peers ) * 100 )
+  ;; let obtained-votes-no count peers with [not empty? chain and first last chain = last-proposed-block] ;; first element (block string) of last item in chain
+  ;; set-current-plot "Block Acceptance"
+  ;; plotxy overall-block ( ( obtained-votes-no / No-of-Peers ) * 100 )
 end
 
 to initiate_block
@@ -283,7 +274,8 @@ to synchronize-current-round-chain
         set list-of-votes lput (last missing-item) list-of-votes
       ]  
     ]
-    set roundchain lput list-of-votes roundchain
+    ;; set roundchain lput list-of-votes roundchain
+    set lastchain list-of-votes
   ]
 end
 

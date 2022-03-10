@@ -1,5 +1,5 @@
 extensions [ rnd ]
-__includes [ "NetLogo/procs.nls" "NetLogo/learning.nls" "NetLogo/elfarol.nls"]
+__includes [ "NetLogo/procs.nls" "NetLogo/learning.nls"]
 
 ;; define universal breeds
 breed [peers peer]
@@ -23,7 +23,8 @@ peers-own [
   block
   block-voters
   chain
-  roundchain
+  ;; roundchain
+  lastchain
   
   ;; Utility Related
   benefit-puoc
@@ -38,13 +39,6 @@ peers-own [
   mixed-strategy-prob
   reputation-limit
   
-  ;; Regret with history
-  regrets
-  
-  ;; Bounded Rationality Related
-  strategies      ;; list of strategies
-  best-strategy   ;; index of the current best strategy
-  prediction      ;; current prediction of the bar attendance
 ]
 
 
@@ -64,11 +58,6 @@ globals [
     
   ;; Calc Related
   no-of-votes-required
-  
-  ;; Bounded Rationality Related
-  ef-history
-  ef-memory-size
-  ef-number-strategies
 
   ;; Timing related
   ;; block-timeout block-start-time ;; for ticks (Not used atm)

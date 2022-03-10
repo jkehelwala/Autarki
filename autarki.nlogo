@@ -111,7 +111,7 @@ Benefit-Per-Unit-Of-Cost
 Benefit-Per-Unit-Of-Cost
 1
 10
-2.0
+3.0
 0.2
 1
 NIL
@@ -124,7 +124,7 @@ CHOOSER
 100
 Learning-Methodology
 Learning-Methodology
-"Random" "> Required" "Mixed Strategy" "Reputation Optimization" "Reputation Optimization (with f)" "Regret Matching" "Regret Matching (with History)" "Bounded Rationality"
+"Random" "> Required" "Mixed Strategy" "Reputation Optimization" "Reputation Optimization (with f)"
 3
 
 SLIDER
@@ -156,47 +156,6 @@ Rounds
 1
 NIL
 HORIZONTAL
-
-PLOT
-30
-270
-385
-430
-Block Acceptance
-Block
-Votes
-0.0
-10.0
-0.0
-1.0
-true
-true
-"" ""
-PENS
-"Obtained" 1.0 0 -5298144 true "" ""
-"Required" 1.0 0 -16777216 true "" ";; plot a threshold line\nplot-pen-reset\nplotxy 0 Votes-Required\nplotxy plot-x-max Votes-Required"
-
-MONITOR
-30
-430
-115
-475
-Current Round
-current-round
-17
-1
-11
-
-MONITOR
-115
-430
-200
-475
-Current Block
-current-block
-2
-1
-11
 
 SLIDER
 425
@@ -237,7 +196,7 @@ Min-Attack-Probability
 Min-Attack-Probability
 0
 0.99
-0.3
+0.0
 0.01
 1
 NIL
@@ -273,17 +232,6 @@ Min-Peer-Cons
 NIL
 HORIZONTAL
 
-MONITOR
-265
-430
-382
-475
-Tolerant to attack
-attack_tolerance_data
-17
-1
-11
-
 SLIDER
 930
 100
@@ -300,10 +248,10 @@ NIL
 HORIZONTAL
 
 PLOT
+25
+245
+380
 405
-270
-760
-430
 Total Protection
 Round
 NIL
@@ -319,10 +267,10 @@ PENS
 "Required" 1.0 0 -7500403 true "" ";; plot a threshold line\nplot-pen-reset\nplotxy 0 Votes-Required\nplotxy plot-x-max Votes-Required"
 
 PLOT
-35
-510
-390
-670
+25
+435
+380
+595
 Average Reputations
 Round
 NIL
@@ -338,10 +286,10 @@ PENS
 "Reputation Limit" 1.0 0 -5298144 true "" ""
 
 PLOT
-785
-270
-1140
-430
+385
+435
+740
+595
 Average Utilities
 NIL
 NIL
@@ -355,22 +303,11 @@ false
 PENS
 "default" 1.0 0 -16777216 true "" ""
 
-MONITOR
-35
-670
-162
-715
-Avg Reputation Limit
-avg-reputation-limit
-3
-1
-11
-
 PLOT
-400
-510
-755
-670
+385
+245
+740
+405
 Validity Count
 NIL
 NIL
@@ -505,7 +442,6 @@ To compare with our original reputation optimization learning methodology perfor
 **[2]**  Hart, S., & Mas‐Colell, A. (2000). A simple adaptive procedure leading to correlated equilibrium. Econometrica, 68(5), 1127-1150.
 
 **[3]** Arthur, W. B. (1994). Inductive reasoning and bounded rationality. The American economic review, 84(2), 406-411.
-
 @#$#@#$#@
 default
 true

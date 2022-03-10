@@ -12,15 +12,6 @@ to-report get-protection
     Learning-Methodology = "Reputation Optimization (with f)" [
       report reputation-optimization-alt
     ]
-    Learning-Methodology = "Regret Matching" [
-      report regret-matching
-    ]
-    Learning-Methodology = "Regret Matching (with History)" [
-      report regret-matching-alt
-    ]
-    Learning-Methodology = "Bounded Rationality" [
-      report ef-learning
-    ]
     Learning-Methodology = "> Required" [ report higher-than-required-protection  ]
     [ report random-protection  ] ;; defaulting to random
   )
@@ -72,7 +63,8 @@ end
 
 
 to set-reputation
-  let list-of-voter-lists last roundchain
+  ;; let list-of-voter-lists last roundchain
+  let list-of-voter-lists lastchain
   let no-of-accepted-blocks length list-of-voter-lists
   let counted-votes length chain
   set effective-availability 0
@@ -105,36 +97,3 @@ to-report weighted-decision [weights]
   ;; weights are the second column (last), return (first) from picked key-val pair  (https://stackoverflow.com/a/41902311 )
 end
 
-to-report regret-matching
-  let u-true get-utility true
-  let u-false get-utility false
-  let u-curr get-utility protected?
-  
-  let regret-true max list (u-true - u-curr) 0
-  let regret-false max list (u-false - u-curr) 0
-  let regret-sum (regret-true + regret-false)
-  
-  if regret-sum <= 0 [
-    console-log("func(regret-matching) - No regret preference. Defaulting to random.")
-    report random-protection 
-  ]
-  let weights (list (regret-true / regret-sum) (regret-false / regret-sum))
-  set regrets lput weights regrets
-  report weighted-decision weights   
-end
-
-
-to-report regret-matching-alt
-  let regret-calc regret-matching ;; unused variable
-    
-  let regret-true sum map first regrets
-  let regret-false sum map last regrets
-  let regret-sum (regret-true + regret-false)
-  
-  if regret-sum <= 0 [
-    console-log("func(regret-matching-alt) - No regret preference. Defaulting to random.")
-    report random-protection 
-  ]
-  let weights (list (regret-true / regret-sum) (regret-false / regret-sum))
-  report weighted-decision weights   
-end
