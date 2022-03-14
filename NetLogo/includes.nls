@@ -1,4 +1,4 @@
-extensions [ rnd csv profiler ]
+extensions [ rnd ]
 __includes [ "NetLogo/procs.nls" "NetLogo/learning.nls"]
 
 ;; define universal breeds
