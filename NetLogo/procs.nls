@@ -1,22 +1,13 @@
 
 to setup
   clear-all
+  profiler:start  ;; start profiling
   init-globals
   set-constants
   setup-peers
   reset-ticks ;; start the clock
-  set-plots
-  print (word ", Timestamp: " date-and-time) 
+  export-env-var
   initiate_round
-end
-
-to set-plots
-  set-current-plot "Total Protection"  
-  set-plot-x-range 0 Rounds
-  set-plot-y-range 0 100
-  set-current-plot "Validity Count"  
-  set-plot-x-range 0 Rounds
-  set-plot-y-range 0 100
 end
 
 to init-globals
@@ -132,8 +123,12 @@ end
 to initiate_round
   set init? true
   set current-round (current-round + 1)
+  reset-global-chart-var
   if end-simulation [
     console-log("Round number reached. Simulation will stop soon.")
+    profiler:stop                                  ;; stop profiling
+    csv:to-file "profiler_data.csv" profiler:data  ;; save the results
+    profiler:reset                                 ;; clear the data  
     stop
   ]
   set current-block 0
@@ -147,6 +142,7 @@ to initiate_round
       update-average-graph
       set chain [] 
     ]
+    write-plots-to-export-file
   ]
   ask peers [ set-peer-protection-decision ]  
   ask battacker [ set-list-of-blocks-to-attack  ]
@@ -156,32 +152,23 @@ end
 
 to set-total-protection
   set total-protection count peers with [protected?] ;; This value could change depending on Block-Timeout based vote exclusions
-  print (word "Round: " current-round ", Timestamp: " date-and-time ", Total Protection: " total-protection) 
-  set-current-plot "Total Protection" 
-  plotxy current-round ( ( total-protection / No-of-Peers ) * 100 )
+  set g-total-protection-percentage ( ( total-protection / No-of-Peers ) * 100 )
   set-reputation-validity-plot
 end
 
 to set-reputation-validity-plot
+  set g-validity-count -1
   if reputation-based? [
-    set-current-plot "Validity Count"  
     let valcount count peers with [valid-probability]
-    plotxy current-round ( ( valcount / No-of-Peers ) * 100 )
+    set g-validity-count ( ( valcount / No-of-Peers ) * 100 )
   ]
-end
-
-to plot-vote-precentage
-  ;; let obtained-votes-no count peers with [not empty? chain and first last chain = last-proposed-block] ;; first element (block string) of last item in chain
-  ;; set-current-plot "Block Acceptance"
-  ;; plotxy overall-block ( ( obtained-votes-no / No-of-Peers ) * 100 )
 end
 
 to initiate_block
   if overall-block > 0 [  
     ask peers [ finalize-proposed-block ]
     console-log(word "Finished: Round: " current-round " Block: " current-block " Overall Block: " overall-block " Attack Tolerance: " attack_tolerance_data)
-    update-plots
-    plot-vote-precentage 
+    ;; plot-vote-precentage 
   ]
   if (current-block + 1) > No-of-Peers [
     initiate_round
@@ -325,14 +312,10 @@ end
 to update-average-graph
   let avg-rep (sum [peer-reputation] of peers / No-of-Peers)
   let avg-util ( sum [get-utility protected?] of peers / No-of-Peers )
-  set-current-plot "Average Reputations"  
-  set-current-plot-pen"Reputation"
-  plotxy current-round avg-rep
+  set g-avg-reputation avg-rep
   if reputation-based? [
     set avg-reputation-limit (sum [reputation-limit] of peers / No-of-Peers)
-    set-current-plot-pen"Reputation Limit"
-    plotxy current-round avg-reputation-limit
+    set g-avg-reputation-limit avg-reputation-limit
   ]
-  set-current-plot "Average Utilities"  
-  plotxy current-round avg-util
+  set g-avg-utility avg-util
 end

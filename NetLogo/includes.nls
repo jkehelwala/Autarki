@@ -1,4 +1,4 @@
-extensions [ rnd ]
+extensions [ rnd csv profiler ]
 __includes [ "NetLogo/procs.nls" "NetLogo/learning.nls"]
 
 ;; define universal breeds
@@ -64,6 +64,14 @@ globals [
   peer-breathe-time
   ;; Visualization Related
   subdue-color ;;  To make non-neighbour links less visible
+  
+  exp_fileloc
+
+  g-total-protection-percentage
+  g-validity-count
+  g-avg-utility
+  g-avg-reputation
+  g-avg-reputation-limit
 ]
 
 
@@ -71,39 +79,36 @@ to console-log [logline]
   ;; output-print(word "LOG - " logline)
 end
 
-to export-env-var [fileloc]
-  file-open fileloc
+to export-env-var
+  let exp_name (word "R1_" behaviorspace-experiment-name "_" behaviorspace-run-number "_" )
+  set exp_fileloc (word "output/tbl_" exp_name "env_all.csv")
+  file-open exp_fileloc
   let sec1 (word  No-of-Peers "," Votes-Required "," Block-Timeout "," Benefit-Per-Unit-Of-Cost "," Heterogeneous-Cost "," Cost-Std-Dev "," Min-Attack-Probability "," Learning-Methodology "," Rounds ",")
   let sec2 (word Min-Con-Delay "," Max-Con-Delay "," Min-Peer-Cons "," Max-Peer-Cons)
   file-print "No-of-Peers,Votes-Required,Block-Timeout,Benefit-Per-Unit-Of-Cost,Heterogeneous-Cost,Cost-Std-Dev,Min-Attack-Probability,Learning-Methodology,Rounds,Min-Con-Delay,Max-Con-Delay,Min-Peer-Cons,Max-Peer-Cons"
   file-print (word sec1 sec2) 
+  file-print ""
+  file-print "Round,Total-Protection,Validity-Count,Avg-Reputation,Avg-Reputation-Limit,Avg-Utility,Votes-Required,Timestamp"
+  file-close
+  reset-global-chart-var
+end
+
+to reset-global-chart-var
+  set g-total-protection-percentage nobody
+  set g-validity-count nobody
+  set g-avg-utility nobody
+  set g-avg-reputation nobody
+  set g-avg-reputation-limit nobody
+end
+
+to write-plots-to-export-file
+  file-open exp_fileloc
+  file-print (word  current-round "," g-total-protection-percentage "," g-validity-count "," g-avg-reputation "," g-avg-reputation-limit "," g-avg-utility "," Votes-Required "," date-and-time) 
   file-close
 end
 
 to export-experiment
-  ;; let ts date-and-time
-  ;; let fsuffix (word  (substring ts 16 18) "_" (substring ts 0 2) "_" (substring ts 3 5) "_" (substring ts 6 8) "_" (substring ts 9 12) "_" (substring ts 13 16) ) 
-  let exp_name (word "R1_" behaviorspace-experiment-name "_" behaviorspace-run-number "_" )
-  
-  
-  ;; if file-exists? (word "output/" exp_name "env.csv") [
-  ;;  set exp_name (word "R2_" behaviorspace-experiment-name "_" behaviorspace-run-number "_" )
-  ;; ]
-  
-  
-  export-charts exp_name
-  ;; export-interface (word "output/" exp_name "img.png")
-  ;; export-all-plots (word "output/plots_" exp_name ".csv")
-  ;; repeat 3 [ beep wait 0.1 ]
-  output-print(word "Completed: " exp_name)
+  output-print(word "Completed: " exp_fileloc)
 end
 
-to export-charts [exp_name]
-  export-env-var (word "output/" exp_name "env.csv")
-  export-plot "Block Acceptance" (word "output/tbl_" exp_name "ba.csv")
-  export-plot "Total Protection" (word "output/tbl_" exp_name "tp.csv")
-  export-plot "Validity Count" (word "output/tbl_" exp_name "vc.csv")
-  export-plot "Average Reputations" (word "output/tbl_" exp_name "rep.csv")
-  export-plot "Average Utilities" (word "output/tbl_" exp_name "util.csv")
-end
 
