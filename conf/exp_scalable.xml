@@ -19,7 +19,7 @@
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Rounds">
-      <value value="10"/>
+      <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Learning-Methodology">
       <value value="&quot;Reputation Optimization&quot;"/>
