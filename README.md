@@ -18,4 +18,4 @@ The model allows users to observe how a rational peer's decision for self-protec
 
 ## Understanding the model
 
-After opening the model from the NetLogo application, you can refer to the `Info` tab for a thorough introduction of the simulation. However, the terminology would be better understood with the accompanying research **Security And Reliability Of Rational Players In Distributed Consensus**, which is included as a PDF file alongside the simulation code.
+After opening the model from the NetLogo application, you can refer to the `Info` tab for a thorough introduction of the simulation. However, the terminology would be better understood with the accompanying research **Security And Reliability Of Rational Players In Distributed Consensus**.
